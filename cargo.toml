@@ -1,0 +1,10 @@
+[package]
+name = "blackjack2"
+version = "0.1.0"
+edition = "2021"
+authors = ["Arsen Martirosyan arsenmartirosyan@protonmail.com>"]
+description = "Console-based Blackjack game in Rust, an improvement by the original Java implementation."
+license = "GPL-3.0"
+
+[dependencies]
+rand = "0.8"
