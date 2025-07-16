@@ -13,19 +13,15 @@ impl BlackJack {
 }
 
 fn main() {
-    // let bjack = BlackJack;
-    // bjack.test();
-    // print!(" ");
-    // delay();
-    // print!(" ");
     let mut input_string = String::new();
+    let showSplash = text_handler::showsplash;
+    delay();
+    showSplash.doit();
     loop {
         println!("Choose an option: (a)bout, (n)ew game, (h)elp: ");
         io::stdin()
             .read_line(&mut input_string)
             .expect("text input failed");
-        let showSplash = text_handler::showsplash;
-        delay();
         if input_string == "a" {
             let about = main_menu::printAbout;
             about.doit();
