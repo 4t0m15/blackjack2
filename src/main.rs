@@ -1,9 +1,9 @@
 //imputs
-use std::time::Duration;
 use std::io;
-mod text_handler;
+use std::time::Duration;
 mod card_handler;
 mod main_menu;
+mod text_handler;
 
 struct BlackJack;
 impl BlackJack {
@@ -28,7 +28,7 @@ fn main() {
         delay();
         if input_string == "a" {
             let about = main_menu::printAbout;
-            about.
+            about.doit();
         }
         showSplash.doit();
     }
