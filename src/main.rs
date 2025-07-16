@@ -16,7 +16,7 @@ fn main() {
     let mut input_string = String::new();
     let showSplash = text_handler::showsplash;
     delay();
-    showSplash.doit();
+    showSplash.doit(); //
     loop {
         println!("Choose an option: (a)bout, (n)ew game, (h)elp: ");
         io::stdin()
