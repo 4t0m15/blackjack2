@@ -18,17 +18,22 @@ fn main() {
     // print!(" ");
     // delay();
     // print!(" ");
+    let mut input_string = String::new();
     loop {
-        let mut input_string = String::new();
         println!("Choose an option: (a)bout, (n)ew game, (h)elp: ");
         io::stdin()
             .read_line(&mut input_string)
             .expect("text input failed");
         let showSplash = text_handler::showsplash;
+        delay();
+        if input_string == "a" {
+            let about = main_menu::printAbout;
+            about.
+        }
         showSplash.doit();
     }
 }
 
 fn delay() {
-    std::thread::sleep(Duration::from_secs(5));
+    std::thread::sleep(Duration::from_secs(2));
 }
