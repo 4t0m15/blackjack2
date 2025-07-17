@@ -3,6 +3,7 @@ use std::time::Duration;
 use std::io;
 mod text_handler;
 mod card_handler;
+mod main_menu;
 
 struct BlackJack;
 impl BlackJack {
@@ -19,7 +20,7 @@ fn main() {
     // print!(" ");
     loop {
         let mut input_string = String::new();
-        println!("select a choice:");
+        println!("Choose an option: (a)bout, (n)ew game, (h)elp: ");
         io::stdin()
             .read_line(&mut input_string)
             .expect("text input failed");
