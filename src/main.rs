@@ -1,6 +1,8 @@
+//imputs
 use std::time::Duration;
-mod textHandler;
-mod cardHandler;
+use std::io;
+mod text_handler;
+mod card_handler;
 
 struct BlackJack;
 impl BlackJack {
@@ -10,13 +12,20 @@ impl BlackJack {
 }
 
 fn main() {
-    let bjack = BlackJack;
-    bjack.test();
-    print!(" ");
-    delay();
-    print!(" ");
-    let showSplash = textHandler::showsplash;
-    showSplash.doit();
+    // let bjack = BlackJack;
+    // bjack.test();
+    // print!(" ");
+    // delay();
+    // print!(" ");
+    loop {
+        let mut input_string = String::new();
+        println!("select a choice:");
+        io::stdin()
+            .read_line(&mut input_string)
+            .expect("text input failed");
+        let showSplash = text_handler::showsplash;
+        showSplash.doit();
+    }
 }
 
 fn delay() {
