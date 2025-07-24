@@ -1,10 +1,13 @@
 //imputs
 //use std::io;
 use std::time::Duration;
+mod art_handler;
 mod card_handler;
-mod main_menu;
-mod text_handler;
+mod enemy_ai_handler;
 mod hand_handler;
+mod main_menu;
+mod player_handler;
+mod text_handler;
 
 struct BlackJack;
 impl BlackJack {
@@ -12,30 +15,30 @@ impl BlackJack {
     //     print!(" ");
     // }
     fn run(&self) {
-        let mut input_string = String::new();
-        let show_splash = text_handler::ShowSplash;
-        delay();
-        show_splash.doit();
         loop {
-            println!("Choose an option: (a)bout, (n)ew game, (h)elp, (q)uit: ");
-            input_string.clear();
-            std::io::stdin()
-                .read_line(&mut input_string)
-                .expect("text input failed");
-            let input = input_string.trim();
-            if input == "a" {
-                let about = main_menu::PrintAbout;
-                about.doit();
-            } else if input == "h" {
-                let help = main_menu::PrintHelp;
-                help.show_controls();
-                help.show_instructions();
-            } else if input == "n" {
-                // Start new game using card_handler
-                card_handler::start_blackjack();
-            } else if input == "q" {
-                std::process::exit(0);
+            text_handler::print_menu();
+            let input = text_handler::read_menu_input();
+            match input.as_str() {
+                "a" => {
+                    let about = main_menu::PrintAbout;
+                    about.doit();
+                }
+                "h" => {
+                    let help = main_menu::PrintHelp;
+                    help.show_controls();
+                    help.show_instructions();
+                }
+                "n" => {
+                    card_handler::start_blackjack();
+                }
+                "q" => {
+                    std::process::exit(0);
+                }
+                _ => {
+                    text_handler::print_invalid_option();
+                }
             }
+            let show_splash = text_handler::ShowSplash;
             show_splash.doit();
         }
     }

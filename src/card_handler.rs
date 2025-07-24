@@ -1,3 +1,4 @@
+use crate::art_handler::{load_art_sections, get_card_art, get_splash_screen, get_message, print_game_status};
 use rand::seq::SliceRandom;
 use rand::thread_rng;
 use std::io::{self, Write};
@@ -6,7 +7,8 @@ use std::time::Duration;
 use std::fs;
 use std::collections::HashMap;
 use std::path::PathBuf;
-use crate::hand_handler::{hand_value, card_art_index, draw};
+use crate::player_handler::{hand_value, card_art_index, draw};
+pub use crate::enemy_ai_handler;
 
 pub struct GameState {
     pub card_deck: Vec<String>,
@@ -21,81 +23,13 @@ pub struct GameState {
     pub deck_index: i32
 }
 
-fn load_art_sections() -> HashMap<String, Vec<String>> {
-    let mut art_path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-    art_path.push("src/otherart.txt");
-    let content = fs::read_to_string(art_path).expect("Failed to read otherart.txt");
-    let mut sections = HashMap::new();
-    let mut current_section = String::new();
-    let mut current_lines = Vec::new();
-    for line in content.lines() {
-        if line.trim_start().starts_with("// ---") {
-            if !current_section.is_empty() {
-                sections.insert(current_section.clone(), current_lines.clone());
-            }
-            current_section = line.trim().to_string();
-            current_lines = Vec::new();
-        } else {
-            current_lines.push(line.to_string());
-        }
-    }
-    if !current_section.is_empty() {
-        sections.insert(current_section, current_lines);
-    }
-    sections
-}
-
-fn get_card_art() -> Vec<String> {
-    let sections = load_art_sections();
-    let art_lines = sections.get("// --- Card ASCII Art (from card_handler.rs) ---").expect("Card art section missing");
-    let mut cards = Vec::new();
-    let mut current = String::new();
-    for line in art_lines {
-        if line.trim().is_empty() && !current.is_empty() {
-            cards.push(current.trim_end().to_string());
-            current = String::new();
-        } else {
-            current.push_str(line);
-            current.push('\n');
-        }
-    }
-    if !current.trim().is_empty() {
-        cards.push(current.trim_end().to_string());
-    }
-    cards
-}
-
-fn get_splash_screen() -> String {
-    let sections = load_art_sections();
-    let splash_lines = sections.get("// --- Splash Screen ASCII Art (from card_handler.rs and text_handler.rs) ---").expect("Splash screen section missing");
-    splash_lines.join("\n")
-}
-
-fn get_message(key: &str, state: Option<&GameState>) -> String {
-    let sections = load_art_sections();
-    let msg_lines = sections.get("// --- Game Prompts and Messages (from card_handler.rs) ---").expect("Messages section missing");
-    for line in msg_lines {
-        if line.contains(key) {
-            let mut msg = line.to_string();
-            if let Some(s) = state {
-                msg = msg.replace("{{money}}", &s.money.to_string())
-                    .replace("{{gamesWon}}", &s.games_won.to_string())
-                    .replace("{{gamesLost}}", &s.games_lost.to_string())
-                    .replace("{{bet}}", &s.bet.to_string());
-                if !s.dealer_cards.is_empty() {
-                    msg = msg.replace("{{dealerCard}}", &s.dealer_cards[0]);
-                }
-                if !s.player_cards.is_empty() {
-                    msg = msg.replace("{{playerCards}}", &s.player_cards.join(", "));
-                }
-                msg = msg.replace("{{playerTotal}}", &hand_value(&s.player_cards).to_string())
-                    .replace("{{dealerTotal}}", &hand_value(&s.dealer_cards).to_string())
-                    .replace("{{dealerCards}}", &s.dealer_cards.join(", "));
-            }
-            return msg;
-        }
-    }
-    format!("[{}]", key)
+fn create_deck() -> Vec<String> {
+    let suits = ["Hearts", "Diamonds", "Clubs", "Spades"];
+    let ranks = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"];
+    suits
+        .iter()
+        .flat_map(|s| ranks.iter().map(move |r| format!("{} {}", r, s)))
+        .collect()
 }
 
 pub fn start_blackjack() {
@@ -135,9 +69,8 @@ pub fn start_blackjack() {
         state.bet = get_bet(&state);
         state.money -= state.bet;
         println!("{}", get_message("Dealer shows", Some(&state)));
-        print_player_cards(&state);
         if player_turn(&mut state) {
-            dealer_turn(&mut state);
+            enemy_ai_handler::dealer_turn(&mut state);
             determine_winner(&mut state);
         }
     }
@@ -167,15 +100,6 @@ fn setup_new_round(state: &mut GameState) {
     state.dealer_card_count = state.dealer_cards.len() as i32;
 }
 
-fn create_deck() -> Vec<String> {
-    let suits = ["Hearts", "Diamonds", "Clubs", "Spades"];
-    let ranks = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"];
-    suits
-        .iter()
-        .flat_map(|s| ranks.iter().map(move |r| format!("{} {}", r, s)))
-        .collect()
-}
-
 fn get_bet(state: &GameState) -> i32 {
     loop {
         print!("How many coins do you want to bet? ");
@@ -191,97 +115,51 @@ fn get_bet(state: &GameState) -> i32 {
     }
 }
 
-fn print_game_status(state: &GameState) {
-    println!("You have {} coins", state.money);
-    println!("Games won: {} | Games lost: {}", state.games_won, state.games_lost);
-}
-
-fn print_player_cards(state: &GameState) {
-    let card_art = get_card_art();
-    println!("{} {}", get_message("Your cards", Some(state)), state.player_cards.join(", "));
-    println!("{}", get_message("Your total", Some(state)));
-
-    // Collect the ASCII art for each card in the player's hand
-    let card_arts: Vec<Vec<&str>> = state.player_cards
-        .iter()
-        .map(|card| card_art[card_art_index(card)].lines().collect())
-        .collect();
-
-    if card_arts.is_empty() {
-        return;
-    }
-
-    // Print the ASCII art side by side
-    for line_idx in 0..card_arts[0].len() {
-        for card in &card_arts {
-            print!("{} ", card[line_idx]);
-        }
-        println!();
-    }
-}
-
 fn player_turn(state: &mut GameState) -> bool {
     loop {
-        print!("Do you want to (h)it, (s)tand, or (d)ouble down? ");
-        io::stdout().flush().ok();
-        let c = read_char();
-        if c == 'h' {
-            let card = draw(state);
-            state.player_cards.push(card.clone());
-            state.player_card_count = state.player_cards.len() as i32;
-            println!("You got: {}", card);
-            print_player_cards(state);
-            if hand_value(&state.player_cards) > 21 {
-                println!("Bust! You went over 21!");
-                state.games_lost += 1;
-                return false;
-            }
-        } else if c == 's' {
-            return true;
-        } else if c == 'd' && state.money >= state.bet {
-            state.money -= state.bet;
-            state.bet *= 2;
-            let card = draw(state);
-            state.player_cards.push(card.clone());
-            state.player_card_count = state.player_cards.len() as i32;
-            println!("You got: {}", card);
-            print_player_cards(state);
-            if hand_value(&state.player_cards) > 21 {
-                println!("Bust! You went over 21!");
-                state.games_lost += 1;
-                return false;
-            }
-            return true;
-        } else {
-            println!("Please type 'h', 's', or 'd'.");
+        println!("Your cards: {:?}", state.player_cards);
+        println!("Dealer's showing card: {:?}", state.dealer_cards.get(0));
+        let mut action_taken = false;
+        print!("Choose an action: (h)it, (s)tand");
+        if state.player_card_count == 2 {
+            print!(", (d)ouble down");
         }
-    }
-}
-
-fn dealer_turn(state: &mut GameState) {
-    println!("Dealer's turn:");
-    println!("Dealer's cards: [{}, Hidden]", state.dealer_cards[0]);
-    while hand_value(&state.dealer_cards) < 17 {
-        let card = draw(state);
-        state.dealer_cards.push(card.clone());
-        state.dealer_card_count = state.dealer_cards.len() as i32;
-        println!("Dealer draws: {}", card);
-    }
-    println!(
-        "Dealer's cards: {:?}",
-        state.dealer_cards.iter().map(|c| c.as_str()).collect::<Vec<_>>()
-    );
-    let card_art = get_card_art();
-    let card_arts: Vec<Vec<&str>> = state.dealer_cards
-        .iter()
-        .map(|card| card_art[card_art_index(card)].lines().collect())
-        .collect();
-    if !card_arts.is_empty() {
-        for line_idx in 0..card_arts[0].len() {
-            for card in &card_arts {
-                print!("{} ", card[line_idx]);
+        print!(": ");
+        io::stdout().flush().ok();
+        let action = read_char();
+        match action {
+            'h' => {
+                draw(state);
+                action_taken = true;
             }
-            println!();
+            's' => {
+                println!("{}", get_message("Dealer's turn", None));
+                enemy_ai_handler::dealer_turn(state);
+                determine_winner(state);
+                return false;
+            }
+            'd' if state.player_card_count == 2 => {
+                if state.money >= state.bet {
+                    state.money -= state.bet;
+                    state.bet *= 2;
+                    draw(state);
+                    println!("{}{}", get_message("You doubled down and drew", None), state.player_cards.last().unwrap());
+                    println!("{}", get_message("Dealer's turn", None));
+                    enemy_ai_handler::dealer_turn(state);
+                    determine_winner(state);
+                } else {
+                    println!("Not enough money to double down!");
+                }
+                return false;
+            }
+            _ => {
+                println!("Invalid action, please choose again.");
+            }
+        }
+        if hand_value(&state.player_cards) > 21 {
+            println!("You busted! Dealer wins.");
+            state.games_lost += 1;
+            return false;
         }
     }
 }
