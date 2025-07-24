@@ -1,5 +1,5 @@
-pub struct printAbout;
-impl printAbout {
+pub struct PrintAbout;
+impl PrintAbout {
     pub fn doit(&self) {
         println!("\
          About: A simple text-based blackjack game written in Rust.
@@ -8,8 +8,8 @@ impl printAbout {
          Created by Arsen Martirosyan.");
     }
 }
-pub struct printHelp;
-impl printHelp {
+pub struct PrintHelp;
+impl PrintHelp {
     pub fn show_controls(&self) {
         print!("\
     Controls: \

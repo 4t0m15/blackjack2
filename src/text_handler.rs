@@ -1,5 +1,5 @@
-pub struct showsplash;
-impl showsplash {
+pub struct ShowSplash;
+impl ShowSplash {
     pub fn doit(&self) {
         println!("
         .------..------..------..------..------..------.        .------..------..------..------..------.
