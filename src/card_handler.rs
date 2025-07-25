@@ -1,14 +1,12 @@
-use crate::art_handler::{load_art_sections, get_card_art, get_splash_screen, get_message, print_game_status};
+use crate::art_handler::{get_message, get_splash_screen, print_game_status};
 use rand::seq::SliceRandom;
 use rand::thread_rng;
 use std::io::{self, Write};
 use std::thread;
 use std::time::Duration;
-use std::fs;
-use std::collections::HashMap;
-use std::path::PathBuf;
-use crate::player_handler::{hand_value, card_art_index, draw};
-pub use crate::enemy_ai_handler;
+
+use crate::enemy_ai_handler;
+use crate::player_handler::{hand_value, player_turn, player_wins, print_player_cards};
 
 pub struct GameState {
     pub card_deck: Vec<String>,
@@ -20,12 +18,14 @@ pub struct GameState {
     pub games_lost: i32,
     pub player_card_count: i32,
     pub dealer_card_count: i32,
-    pub deck_index: i32
+    pub deck_index: i32,
 }
 
 fn create_deck() -> Vec<String> {
     let suits = ["Hearts", "Diamonds", "Clubs", "Spades"];
-    let ranks = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"];
+    let ranks = [
+        "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A",
+    ];
     suits
         .iter()
         .flat_map(|s| ranks.iter().map(move |r| format!("{} {}", r, s)))
@@ -69,6 +69,7 @@ pub fn start_blackjack() {
         state.bet = get_bet(&state);
         state.money -= state.bet;
         println!("{}", get_message("Dealer shows", Some(&state)));
+        print_player_cards(&state);
         if player_turn(&mut state) {
             enemy_ai_handler::dealer_turn(&mut state);
             determine_winner(&mut state);
@@ -115,55 +116,6 @@ fn get_bet(state: &GameState) -> i32 {
     }
 }
 
-fn player_turn(state: &mut GameState) -> bool {
-    loop {
-        println!("Your cards: {:?}", state.player_cards);
-        println!("Dealer's showing card: {:?}", state.dealer_cards.get(0));
-        let mut action_taken = false;
-        print!("Choose an action: (h)it, (s)tand");
-        if state.player_card_count == 2 {
-            print!(", (d)ouble down");
-        }
-        print!(": ");
-        io::stdout().flush().ok();
-        let action = read_char();
-        match action {
-            'h' => {
-                draw(state);
-                action_taken = true;
-            }
-            's' => {
-                println!("{}", get_message("Dealer's turn", None));
-                enemy_ai_handler::dealer_turn(state);
-                determine_winner(state);
-                return false;
-            }
-            'd' if state.player_card_count == 2 => {
-                if state.money >= state.bet {
-                    state.money -= state.bet;
-                    state.bet *= 2;
-                    draw(state);
-                    println!("{}{}", get_message("You doubled down and drew", None), state.player_cards.last().unwrap());
-                    println!("{}", get_message("Dealer's turn", None));
-                    enemy_ai_handler::dealer_turn(state);
-                    determine_winner(state);
-                } else {
-                    println!("Not enough money to double down!");
-                }
-                return false;
-            }
-            _ => {
-                println!("Invalid action, please choose again.");
-            }
-        }
-        if hand_value(&state.player_cards) > 21 {
-            println!("You busted! Dealer wins.");
-            state.games_lost += 1;
-            return false;
-        }
-    }
-}
-
 fn determine_winner(state: &mut GameState) {
     let p_total = hand_value(&state.player_cards);
     let d_total = hand_value(&state.dealer_cards);
@@ -182,17 +134,12 @@ fn determine_winner(state: &mut GameState) {
     }
 }
 
-fn player_wins(state: &mut GameState) {
-    println!("\x1b[1;32m{}\x1b[0m", get_message("You Win!", None));
-    state.money += state.bet * 2;
-    state.games_won += 1;
-}
 fn dealer_wins(state: &mut GameState) {
     println!("\x1b[1;31m{}\x1b[0m", get_message("Dealer Wins!", None));
     state.games_lost += 1;
 }
 
-fn read_char() -> char {
+pub fn read_char() -> char {
     let mut line = String::new();
     io::stdin().read_line(&mut line).ok();
     line.trim().chars().next().unwrap_or('\n')

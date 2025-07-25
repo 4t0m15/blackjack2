@@ -1,5 +1,5 @@
-use crate::hand_handler::{hand_value, card_art_index, draw};
 use crate::art_handler::get_card_art;
+use crate::player_handler::{card_art_index, draw, hand_value};
 
 pub fn dealer_turn(state: &mut crate::card_handler::GameState) {
     println!("Dealer's turn:");
@@ -12,11 +12,16 @@ pub fn dealer_turn(state: &mut crate::card_handler::GameState) {
     }
     println!(
         "Dealer's cards: {:?}",
-        state.dealer_cards.iter().map(|c| c.as_str()).collect::<Vec<_>>()
+        state
+            .dealer_cards
+            .iter()
+            .map(|c| c.as_str())
+            .collect::<Vec<_>>()
     );
     let card_art = get_card_art();
     // Print the ASCII art for each dealer card side by side
-    let card_arts: Vec<Vec<&str>> = state.dealer_cards
+    let card_arts: Vec<Vec<&str>> = state
+        .dealer_cards
         .iter()
         .map(|card| card_art[card_art_index(card)].lines().collect())
         .collect();

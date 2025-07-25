@@ -1,13 +1,7 @@
 pub struct ShowSplash;
 impl ShowSplash {
     pub fn doit(&self) {
-        println!("
-        .------..------..------..------..------..------.        .------..------..------..------..------.
-        |4.--. ||t.--. ||0.--. ||m.--. ||1.--. ||5.--. | .-.    |G.--. ||A.--. ||M.--. ||E.--. ||S.--. |
-        | (\\/) || :/\\: || :/\\: || (\\/) || (\\/) || :/\\: |(())   | :/\\: || (\\/) || (\\/) || (\\/) || :/\\: |
-        | :\\/: || (__) || :\\/: || :\\/: || :\\/: || :\\/: | '-.-.  | :\\/: || :\\/: || :\\/: || :\\/: || :\\/: |
-        | '--'4|| '--'t|| '--'0|| '--'m|| '--'1|| '--'5|  (()) | '--'G|| '--'A|| '--'M|| '--'E|| '--'S|
-        `------'`------'`------'`------'`------'`------'   '-'  `------'`------'`------'`------'`------'");
+        println!("{}", crate::art_handler::get_splash_screen());
     }
 }
 
@@ -19,7 +13,9 @@ pub fn read_menu_input() -> String {
     use std::io::{self, Write};
     let mut input_string = String::new();
     io::stdout().flush().ok();
-    io::stdin().read_line(&mut input_string).expect("text input failed");
+    io::stdin()
+        .read_line(&mut input_string)
+        .expect("text input failed");
     input_string.trim().to_string()
 }
 

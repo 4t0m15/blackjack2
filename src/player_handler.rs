@@ -1,6 +1,6 @@
-use crate::card_handler::GameState;
+use crate::art_handler::get_card_art;
+use crate::card_handler::{read_char, GameState};
 use std::io::{self, Write};
-use crate::art_handler::{get_card_art, get_message};
 
 pub fn hand_value(hand: &[String]) -> i32 {
     let mut total = 0;
@@ -49,10 +49,10 @@ pub fn draw(state: &mut GameState) -> String {
 }
 
 pub fn print_player_cards(state: &GameState) {
-    println!("{} {}", get_message("Your cards", Some(state)), state.player_cards.join(", "));
-    println!("{}", get_message("Your total", Some(state)));
+    println!("Your total: {}", hand_value(&state.player_cards));
     let card_art = get_card_art();
-    let card_arts: Vec<Vec<&str>> = state.player_cards
+    let card_arts: Vec<Vec<&str>> = state
+        .player_cards
         .iter()
         .map(|card| card_art[card_art_index(card)].lines().collect())
         .collect();
@@ -68,59 +68,59 @@ pub fn print_player_cards(state: &GameState) {
 }
 
 pub fn player_turn(state: &mut GameState) -> bool {
-    use crate::card_handler::{hand_value, draw};
     loop {
-        print!("Do you want to (h)it, (s)tand, or (d)ouble down? ");
+        print!("Choose an action: (h)it, (s)tand");
+        if state.player_card_count == 2 && state.money >= state.bet {
+            print!(", (d)ouble down");
+        }
+        print!(": ");
         io::stdout().flush().ok();
-        let c = read_char();
-        if c == 'h' {
-            let card = draw(state);
-            state.player_cards.push(card.clone());
-            state.player_card_count = state.player_cards.len() as i32;
-            println!("You got: {}", card);
-            print_player_cards(state);
-            if hand_value(&state.player_cards) > 21 {
-                println!("Bust! You went over 21!");
-                state.games_lost += 1;
-                return false;
+
+        let action = read_char();
+        match action {
+            'h' => {
+                let card = draw(state);
+                state.player_cards.push(card.clone());
+                state.player_card_count = state.player_cards.len() as i32;
+                println!("You got: {}", card);
+                print_player_cards(state);
+
+                if hand_value(&state.player_cards) > 21 {
+                    println!("You busted! Dealer wins.");
+                    state.games_lost += 1;
+                    return false;
+                }
             }
-        } else if c == 's' {
-            return true;
-        } else if c == 'd' && state.money >= state.bet {
-            state.money -= state.bet;
-            state.bet *= 2;
-            let card = draw(state);
-            state.player_cards.push(card.clone());
-            state.player_card_count = state.player_cards.len() as i32;
-            println!("You got: {}", card);
-            print_player_cards(state);
-            if hand_value(&state.player_cards) > 21 {
-                println!("Bust! You went over 21!");
-                state.games_lost += 1;
-                return false;
+            's' => return true,
+            'd' if state.player_card_count == 2 && state.money >= state.bet => {
+                state.money -= state.bet;
+                state.bet *= 2;
+                let card = draw(state);
+                state.player_cards.push(card.clone());
+                state.player_card_count = state.player_cards.len() as i32;
+                println!("You doubled down and drew: {}", card);
+                print_player_cards(state);
+
+                if hand_value(&state.player_cards) > 21 {
+                    println!("You busted! Dealer wins.");
+                    state.games_lost += 1;
+                    return false;
+                }
+                return true;
             }
-            return true;
-        } else {
-            println!("Please type 'h', 's', or 'd'.");
+            'd' if state.money < state.bet => {
+                println!("Not enough money to double down!");
+            }
+            _ => {
+                println!("Invalid action, please choose again.");
+            }
         }
     }
 }
 
 pub fn player_wins(state: &mut GameState) {
-    use crate::card_handler::get_message;
+    use crate::art_handler::get_message;
     println!("\x1b[1;32m{}\x1b[0m", get_message("You Win!", None));
     state.money += state.bet * 2;
     state.games_won += 1;
-}
-
-pub fn dealer_wins(state: &mut GameState) {
-    use crate::card_handler::get_message;
-    println!("\x1b[1;31m{}\x1b[0m", get_message("Dealer Wins!", None));
-    state.games_lost += 1;
-}
-
-fn read_char() -> char {
-    let mut line = String::new();
-    io::stdin().read_line(&mut line).ok();
-    line.trim().chars().next().unwrap_or('\n')
 }
