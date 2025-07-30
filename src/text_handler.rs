@@ -6,7 +6,7 @@ impl ShowSplash {
 }
 
 pub fn print_menu() {
-    println!("Choose an option: (a)bout, (n)ew game, (h)elp, (q)uit: ");
+    println!("Choose an option: (a)bout, (n)ew game, (h)elp, (g)uide, (q)uit: ");
 }
 
 pub fn read_menu_input() -> String {

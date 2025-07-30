@@ -20,9 +20,12 @@ impl BlackJack {
                     about.doit();
                 }
                 "h" => {
-                    let help = main_menu::PrintHelp;
+                    let help: main_menu::PrintHelp = main_menu::PrintHelp;
                     help.show_controls();
-                    help.show_instructions();
+                }
+                "g" => {
+                    let help2: main_menu::PrintHelp = main_menu::PrintHelp;
+                    help2.show_instructions();
                 }
                 "n" => {
                     card_handler::start_blackjack();

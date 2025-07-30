@@ -27,11 +27,16 @@
         pub fn show_instructions(&self) {
             print!(
                 " How to play: \
-            THE PLAYER is served a card by a DEALER.\
-            THE PLAYER can choose to HIT and get a card.\
-            Although this can lead the player to BUST.\
-            A BUST is when THE PLAYER'S cards go over 21.\
-            The DEALER will also be served a card.\
+            THE PLAYER is served a card\
+            by a DEALER.\
+            THE PLAYER can choose to HIT\
+            and get a card.\
+            Although this can lead\
+            the player to BUST.\
+            A BUST is when THE PLAYER'S\
+            cards go over 21.\
+            The DEALER will\
+            also be served a card.\
             The idea is to have more than the DEALER, but not BUST."
             );
         }

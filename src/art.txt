@@ -132,4 +132,4 @@ Dealer Wins!
 loading...
 
 // --- Main Menu Prompt (from main.rs) ---
-Choose an option: (a)bout, (n)ew game, (h)elp:
+Choose an option: (a)bout, (n)ew game, (h)elp, (g)uide:
