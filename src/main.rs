@@ -6,44 +6,26 @@ mod menu_handling;
 mod player_handler;
 mod text_handler;
 
-struct BlackJack;
+use menu_handling::Menu;
+
+struct BlackJack {
+    menu: Menu,
+}
 
 impl BlackJack {
-    fn run(&self) {
+    fn new() -> Self {
+        BlackJack { menu: Menu::new() }
+    }
+
+    fn run(&mut self) {
         let show_splash = text_handler::ShowSplash;
         show_splash.doit();
-        loop {
-            text_handler::print_menu();
-            let input = text_handler::read_menu_input();
-            match input.as_str() {
-                "a" => {
-                    let about = main_menu::PrintAbout;
-                    about.doit();
-                }
-                "h" => {
-                    let help: main_menu::PrintHelp = main_menu::PrintHelp;
-                    help.show_controls();
-                }
-                "g" => {
-                    let help2: main_menu::PrintHelp = main_menu::PrintHelp;
-                    help2.show_instructions();
-                }
-                "n" => {
-                    card_handler::start_blackjack();
-                }
-                "q" => {
-                    std::process::exit(0);
-                }
-                _ => {
-                    text_handler::print_invalid_option();
-                }
-            }
-        }
+
+        self.menu.run_loop();
     }
 }
 
 fn main() {
-    let game = BlackJack;
+    let mut game = BlackJack::new();
     game.run();
 }
-//testing version control
