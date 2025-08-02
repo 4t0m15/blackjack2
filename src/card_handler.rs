@@ -37,7 +37,7 @@ pub fn start_blackjack() {
         card_deck: Vec::new(),
         player_cards: Vec::new(),
         dealer_cards: Vec::new(),
-        money: 10,
+        money: 100,
         bet: 0,
         games_won: 0,
         games_lost: 0,
