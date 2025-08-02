@@ -1,69 +1,24 @@
-pub fn print_splash() {
-    println!(
-        "
-.------..------..------..------..------..------.        .------..------..------..------..------.
-|4.--. ||t.--. ||0.--. ||m.--. ||1.--. ||5.--. | .-.    |G.--. ||A.--. ||M.--. ||E.--. ||S.--. |
-| (\\/) || :/\\: || :/\\: || (\\/) || (\\/) || :/\\: |(())   | :/\\: || (\\/) || (\\/) || (\\/) || :/\\: |
-| :\\/: || (__) || :\\/: || :\\/: || :\\/: || :\\/: | '-.-.  | :\\/: || :\\/: || :\\/: || :\\/: || :\\/: |
-| '--'4|| '--'t|| '--'0|| '--'m|| '--'1|| '--'5|  (()) | '--'G|| '--'A|| '--'M|| '--'E|| '--'S|
-`------'`------'`------'`------'`------'`------'   '-'  `------'`------'`------'`------'`------'
-"
-    );
+pub struct ShowSplash;
+impl ShowSplash {
+    pub fn doit(&self) {
+        println!("{}", crate::art_handler::get_splash_screen());
+    }
 }
 
-pub fn print_welcome() {
-    println!(
-        "
-\033[1;34m
-▀███████████▄   ▄█          ▄████████  ▄████████  ▄█   ▄█▄      ▄█    ▄████████  ▄████████    ▄█   ▄█▄
-  ███    ███ ███         ███    ███ ███    ███   ███ ▄███▀     ███     ███    ███ ███    ███   ███ ▄███▀
-  ███    ███ ███         ███    ███ ███    █▀    ███▐██▀       ███     ███    ███ ███    █▀    ███▐██▀
- ▄███▄▄▄██▀  ███         ███    ███ ███         ▄█████▀        ███     ███    ███ ███         ▄██████▀
-  ▀▀███▀▀▀██▄  ███       ▀███████████ ███        ▀▀█████▄        ███   ▀███████████ ███        ▀▀█████▄
-  ███    ██▄ ███         ███    ███ ███    █▄    ███▐██▄       ███     ███    ███ ███    █▄    ███▐██▄
-  ███    ███ ███▌    ▄   ███    ███ ███    ████   ███ ▀███▄    ███    ███    ███ ███    ███   ███ ▀███▄
-▄█████████▀  █████▄▄██   ███    █▀  ████████▀    ███   ▀█▀ █▄ ▄███     ███    █▀  ████████▀    ███   ▀█▀
-                 ▀                                   ▀         ▀▀▀▀▀▀                              ▀
-\033[0m"
-    );
+pub fn print_menu() {
+    println!("Choose an option: (a)bout, (n)ew game, (h)elp, (g)uide, (q)uit: ");
 }
 
-/// Prints the game over ASCII art.
-pub fn print_game_over() {
-    println!(
-        "
-\033[1;31m
- /$$     /$$                        /$$
-|  $$   /$$/                       | $$
- \\  $$ /$$//$$$$$$  /$$   /$$      | $$        /$$$$$$   /$$$$$$$  /$$$$$$
-  \\  $$$$//$$__  $$| $$  | $$      | $$       /$$__  $$ /$$_____/ /$$__  $$
-   \\  $$/| $$  \\ $$| $$  | $$      | $$      | $$  \\ $$|  $$$$$$ | $$$$$$$$
-    | $$ | $$  | $$| $$  | $$      | $$      | $$  | $$ \\____  $$| $$_____/
-    | $$ |  $$$$$$/|  $$$$$$/      | $$$$$$$$|  $$$$$$/ /$$$$$$$/|  $$$$$$$
-    |__/  \\______/  \\______/       |________/ \\______/ |_______/  \\_______/
-\033[0m"
-    );
+pub fn read_menu_input() -> String {
+    use std::io::{self, Write};
+    let mut input_string = String::new();
+    io::stdout().flush().ok();
+    io::stdin()
+        .read_line(&mut input_string)
+        .expect("text input failed");
+    input_string.trim().to_string()
 }
 
-/// Prints the help/instructions for the game.
-pub fn print_help() {
-    println!(
-        "Instructions:
-- (h)it: Draw another card.
-- (s)tand: Keep your current hand.
-- (d)ouble down: Double your bet and draw one final card."
-    );
-}
-
-/// Prints instructions on how to play the game.
-pub fn show_instructions() {
-    print!(
-        " How to play: \
-        THE PLAYER is served a card by a DEALER.\
-        THE PLAYER can choose to HIT and get a card.\
-        Although this can lead the player to BUST.\
-        A BUST is when THE PLAYER'S cards go over 21.\
-        The DEALER will also be served a card.\
-        The idea is to have more than the DEALER, but not BUST."
-    );
+pub fn print_invalid_option() {
+    println!("Invalid option. Please try again.");
 }

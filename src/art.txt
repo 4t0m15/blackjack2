@@ -1,0 +1,135 @@
+// --- Card ASCII Art (from card_handler.rs) ---
+  _____
+ |A .  |
+ | /.\ |
+ |(_._)|
+ |  |  |
+ |____A|
+
+  _____
+ |2    |
+ |  ^  |
+ |     |
+ |  ^  |
+ |____2|
+
+  _____
+ |3    |
+ | ^ ^ |
+ |     |
+ |  ^  |
+ |____3|
+
+  _____
+ |4    |
+ | ^ ^ |
+ |     |
+ | ^ ^ |
+ |____4|
+
+  _____
+ |5    |
+ | ^ ^ |
+ |  ^  |
+ | ^ ^ |
+ |____5|
+
+  _____
+ |6    |
+ | ^ ^ |
+ | ^ ^ |
+ | ^ ^ |
+ |____6|
+
+  _____
+ |7    |
+ | ^ ^ |
+ |^ ^ ^|
+ | ^ ^ |
+ |____7|
+
+  _____
+ |8    |
+ |^ ^ ^|
+ |^ ^ ^|
+ |^ ^ ^|
+ |____8|
+
+  _____
+ |9    |
+ |^ ^ ^|
+ |^ ^ ^|
+ |^ ^ ^|
+ |____9|
+
+  _____
+ |10 ^ |
+ |^ ^ ^|
+ |^ ^ ^|
+ |^ ^ ^|
+ |___10|
+
+  _____
+ |J  ww|
+ | ^ {)|
+ |(.)%%|
+ | |%%%|
+ |_%%%>|
+
+  _____
+ |Q  ww|
+ | ^ {(|
+ |(.)%%|
+ | |%%%|
+ |_%%%>|
+
+  _____
+ |K  WW|
+ | ^ {)|
+ |(.)%%|
+ | |%%%|
+ |_%%%>|
+
+  _____
+ |A ^  |
+ | / \ |
+ | \ / |
+ |  .  |
+ |____A|
+
+// --- Splash Screen ASCII Art (from card_handler.rs and text_handler.rs) ---
+.------..------..------..------..------..------.        .------..------..------..------..------.
+|4.--. ||t.--. ||0.--. ||m.--. ||1.--. ||5.--. | .-.    |G.--. ||A.--. ||M.--. ||E.--. ||S.--. |
+| (\/) || :/\: || :/\: || (\/) || (\/) || :/\: |(())   | :/\: || (\/) || (\/) || (\/) || :/\: |
+| :\/: || (__) || :\/: || :\/: || :\/: || :\/: | '-.-.  | :\/: || :\/: || :\/: || :\/: || :\/: |
+| '--'4|| '--'t|| '--'0|| '--'m|| '--'1|| '--'5|  (()) | '--'G|| '--'A|| '--'M|| '--'E|| '--'S|
+`------'`------'`------'`------'`------'`------'   '-'  `------'`------'`------'`------'`------'
+
+// --- Game Prompts and Messages (from card_handler.rs) ---
+You have {{money}} coins. Games won: {{gamesWon}} | Games lost: {{gamesLost}}
+Game Over
+Do you want to (t)ry again or (q)uit?
+Dealer shows: [{{dealerCard}}, Hidden]
+Your cards: {{playerCards}}
+Your total: {{playerTotal}}
+How many coins do you want to bet?
+Please bet between 1 and {{money}} coins.
+You have {{money}} coins
+Games won: {{gamesWon}} | Games lost: {{gamesLost}}
+Do you want to (h)it, (s)tand, or (d)ouble down?
+You got: {{card}}
+Bust! You went over 21!
+Please type 'h', 's', or 'd'.
+Dealer's turn:
+Dealer's cards: [{{dealerCard}}, Hidden]
+Dealer draws: {{card}}
+Dealer's cards: {{dealerCards}}
+Your total: {{playerTotal}}
+Dealer's total: {{dealerTotal}}
+It's a tie!
+You Win!
+Dealer Wins!
+loading...
+
+// --- Main Menu Prompt (from main.rs) ---
+Choose an option: (a)bout, (n)ew game, (h)elp, (g)uide:
