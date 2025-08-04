@@ -2,6 +2,12 @@ use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::Path;
 
+const SAVE_FILE: &str = "blackjack_save.json";
+const DEFAULT_STARTING_MONEY: i32 = 100;
+
+// Export constants for use in other modules
+pub const STARTING_MONEY: i32 = DEFAULT_STARTING_MONEY;
+
 /// Structure to hold persistent player data that should be saved
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct SaveData {
@@ -13,15 +19,12 @@ pub struct SaveData {
 impl Default for SaveData {
     fn default() -> Self {
         SaveData {
-            money: 100, // Starting money
+            money: DEFAULT_STARTING_MONEY,
             games_won: 0,
             games_lost: 0,
-            //this is for me to have a seperate commit for the save system
         }
     }
 }
-
-const SAVE_FILE: &str = "blackjack_save.json";
 
 /// Load player save data from file, or return default if file doesn't exist
 pub fn load_save_data() -> SaveData {
@@ -63,5 +66,14 @@ pub fn save_game_data(save_data: &SaveData) -> Result<(), Box<dyn std::error::Er
 pub fn auto_save(save_data: &SaveData) {
     if let Err(e) = save_game_data(save_data) {
         eprintln!("⚠ Warning: Could not save game data: {}", e);
+    }
+}
+
+/// Helper function to create SaveData from game state values
+pub fn create_save_data(money: i32, games_won: i32, games_lost: i32) -> SaveData {
+    SaveData {
+        money,
+        games_won,
+        games_lost,
     }
 }

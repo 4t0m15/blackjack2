@@ -1,13 +1,19 @@
 use crate::art_handler::get_card_art;
 use crate::card_handler::{read_char, GameState};
-use crate::save_system::{auto_save, SaveData};
+use crate::save_system::{auto_save, create_save_data};
 use std::io::{self, Write};
 
 pub fn hand_value(hand: &[String]) -> i32 {
     let mut total = 0;
     let mut aces = 0;
     for card in hand {
-        let rank = card.split_whitespace().next().unwrap();
+        let rank = match card.split_whitespace().next() {
+            Some(rank) => rank,
+            None => {
+                eprintln!("Warning: Invalid card format: {}", card);
+                continue;
+            }
+        };
         match rank {
             "A" => {
                 total += 11;
@@ -25,21 +31,24 @@ pub fn hand_value(hand: &[String]) -> i32 {
 }
 
 pub fn card_art_index(card: &str) -> usize {
-    match card.split_whitespace().next().unwrap() {
-        "A" => 0,
-        "2" => 1,
-        "3" => 2,
-        "4" => 3,
-        "5" => 4,
-        "6" => 5,
-        "7" => 6,
-        "8" => 7,
-        "9" => 8,
-        "10" => 9,
-        "J" => 10,
-        "Q" => 11,
-        "K" => 12,
-        _ => 0,
+    match card.split_whitespace().next() {
+        Some("A") => 0,
+        Some("2") => 1,
+        Some("3") => 2,
+        Some("4") => 3,
+        Some("5") => 4,
+        Some("6") => 5,
+        Some("7") => 6,
+        Some("8") => 7,
+        Some("9") => 8,
+        Some("10") => 9,
+        Some("J") => 10,
+        Some("Q") => 11,
+        Some("K") => 12,
+        _ => {
+            eprintln!("Warning: Unknown card rank in '{}', using default", card);
+            0
+        }
     }
 }
 
@@ -90,11 +99,7 @@ pub fn player_turn(state: &mut GameState) -> bool {
                     println!("You busted! Dealer wins.");
                     state.games_lost += 1;
                     // Auto-save after player bust
-                    let save_data = SaveData {
-                        money: state.money,
-                        games_won: state.games_won,
-                        games_lost: state.games_lost,
-                    };
+                    let save_data = create_save_data(state.money, state.games_won, state.games_lost);
                     auto_save(&save_data);
                     return false;
                 }
@@ -113,11 +118,7 @@ pub fn player_turn(state: &mut GameState) -> bool {
                     println!("You busted! Dealer wins.");
                     state.games_lost += 1;
                     // Auto-save after player bust on double down
-                    let save_data = SaveData {
-                        money: state.money,
-                        games_won: state.games_won,
-                        games_lost: state.games_lost,
-                    };
+                    let save_data = create_save_data(state.money, state.games_won, state.games_lost);
                     auto_save(&save_data);
                     return false;
                 }

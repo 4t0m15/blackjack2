@@ -7,7 +7,13 @@ use std::path::PathBuf;
 pub fn load_art_sections() -> HashMap<String, Vec<String>> {
     let mut art_path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     art_path.push("src/art.txt");
-    let content = fs::read_to_string(art_path).expect("Failed to read art.txt file");
+    let content = match fs::read_to_string(&art_path) {
+        Ok(content) => content,
+        Err(e) => {
+            eprintln!("Warning: Failed to read art.txt file: {}. Using default values.", e);
+            return HashMap::new();
+        }
+    };
     let mut sections = HashMap::new();
     let mut current_section = String::new();
     let mut current_lines = Vec::new();
@@ -30,9 +36,13 @@ pub fn load_art_sections() -> HashMap<String, Vec<String>> {
 
 pub fn get_card_art() -> Vec<String> {
     let sections = load_art_sections();
-    let art_lines = sections
-        .get("// --- Card ASCII Art (from card_handler.rs) ---")
-        .expect("Card art section missing");
+    let art_lines = match sections.get("// --- Card ASCII Art (from card_handler.rs) ---") {
+        Some(lines) => lines,
+        None => {
+            eprintln!("Warning: Card art section missing. Using fallback.");
+            return vec!["[CARD]".to_string(); 13]; // 13 different card ranks
+        }
+    };
     let mut cards = Vec::new();
     let mut current = String::new();
     for line in art_lines {
@@ -52,17 +62,25 @@ pub fn get_card_art() -> Vec<String> {
 
 pub fn get_splash_screen() -> String {
     let sections = load_art_sections();
-    let splash_lines = sections
-        .get("// --- Splash Screen ASCII Art (from card_handler.rs and text_handler.rs) ---")
-        .expect("Splash screen section missing");
+    let splash_lines = match sections.get("// --- Splash Screen ASCII Art (from card_handler.rs and text_handler.rs) ---") {
+        Some(lines) => lines,
+        None => {
+            eprintln!("Warning: Splash screen section missing. Using fallback.");
+            return "🃏 BLACKJACK 🃏\nWelcome to the game!".to_string();
+        }
+    };
     splash_lines.join("\n")
 }
 
 pub fn get_message(key: &str, state: Option<&GameState>) -> String {
     let sections = load_art_sections();
-    let msg_lines = sections
-        .get("// --- Game Prompts and Messages (from card_handler.rs) ---")
-        .expect("Messages section missing");
+    let msg_lines = match sections.get("// --- Game Prompts and Messages (from card_handler.rs) ---") {
+        Some(lines) => lines,
+        None => {
+            eprintln!("Warning: Messages section missing. Using fallback.");
+            return format!("[{}]", key);
+        }
+    };
     for line in msg_lines {
         if line.contains(key) {
             let mut msg = line.to_string();

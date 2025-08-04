@@ -1,5 +1,5 @@
 use crate::art_handler::{get_message, get_splash_screen, print_game_status};
-use crate::save_system::{auto_save, load_save_data, SaveData};
+use crate::save_system::{auto_save, create_save_data, load_save_data, STARTING_MONEY};
 use rand::seq::SliceRandom;
 use rand::thread_rng;
 use std::io::{self, Write};
@@ -60,15 +60,11 @@ pub fn start_blackjack() {
             io::stdout().flush().ok();
             let c = read_char();
             if c == 't' {
-                state.money = 10;
+                state.money = STARTING_MONEY;
                 state.games_won = 0;
                 state.games_lost = 0;
                 // Save the reset state
-                let save_data = SaveData {
-                    money: state.money,
-                    games_won: state.games_won,
-                    games_lost: state.games_lost,
-                };
+                let save_data = create_save_data(state.money, state.games_won, state.games_lost);
                 auto_save(&save_data);
                 continue;
             } else {
@@ -84,7 +80,9 @@ pub fn start_blackjack() {
 
         // Insurance offer when dealer shows an Ace
         let mut insurance_bet = 0;
-        if state.dealer_cards[0].split_whitespace().next().unwrap() == "A" {
+        if state.dealer_cards.first()
+            .and_then(|card| card.split_whitespace().next())
+            .map_or(false, |rank| rank == "A") {
             print!("Dealer shows an Ace - do you want insurance (y/n)? ");
             io::stdout().flush().ok();
             let ans = read_char();
@@ -108,11 +106,7 @@ pub fn start_blackjack() {
                 }
                 state.games_lost += 1;
                 // Auto-save after dealer blackjack
-                let save_data = SaveData {
-                    money: state.money,
-                    games_won: state.games_won,
-                    games_lost: state.games_lost,
-                };
+                let save_data = create_save_data(state.money, state.games_won, state.games_lost);
                 auto_save(&save_data);
                 continue; // end round immediately
             } else {
