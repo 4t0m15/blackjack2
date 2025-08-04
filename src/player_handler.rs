@@ -1,5 +1,6 @@
 use crate::art_handler::get_card_art;
 use crate::card_handler::{read_char, GameState};
+use crate::save_system::{auto_save, SaveData};
 use std::io::{self, Write};
 
 pub fn hand_value(hand: &[String]) -> i32 {
@@ -88,6 +89,13 @@ pub fn player_turn(state: &mut GameState) -> bool {
                 if hand_value(&state.player_cards) > 21 {
                     println!("You busted! Dealer wins.");
                     state.games_lost += 1;
+                    // Auto-save after player bust
+                    let save_data = SaveData {
+                        money: state.money,
+                        games_won: state.games_won,
+                        games_lost: state.games_lost,
+                    };
+                    auto_save(&save_data);
                     return false;
                 }
             }
@@ -104,6 +112,13 @@ pub fn player_turn(state: &mut GameState) -> bool {
                 if hand_value(&state.player_cards) > 21 {
                     println!("You busted! Dealer wins.");
                     state.games_lost += 1;
+                    // Auto-save after player bust on double down
+                    let save_data = SaveData {
+                        money: state.money,
+                        games_won: state.games_won,
+                        games_lost: state.games_lost,
+                    };
+                    auto_save(&save_data);
                     return false;
                 }
                 return true;

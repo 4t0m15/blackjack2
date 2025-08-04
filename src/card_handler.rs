@@ -1,4 +1,5 @@
 use crate::art_handler::{get_message, get_splash_screen, print_game_status};
+use crate::save_system::{auto_save, load_save_data, SaveData};
 use rand::seq::SliceRandom;
 use rand::thread_rng;
 use std::io::{self, Write};
@@ -33,14 +34,17 @@ fn create_deck() -> Vec<String> {
 }
 
 pub fn start_blackjack() {
+    // Load saved data
+    let save_data = load_save_data();
+    
     let mut state = GameState {
         card_deck: Vec::new(),
         player_cards: Vec::new(),
         dealer_cards: Vec::new(),
-        money: 100,
+        money: save_data.money,
         bet: 0,
-        games_won: 0,
-        games_lost: 0,
+        games_won: save_data.games_won,
+        games_lost: save_data.games_lost,
         player_card_count: 0,
         dealer_card_count: 0,
         deck_index: 0,
@@ -59,6 +63,13 @@ pub fn start_blackjack() {
                 state.money = 10;
                 state.games_won = 0;
                 state.games_lost = 0;
+                // Save the reset state
+                let save_data = SaveData {
+                    money: state.money,
+                    games_won: state.games_won,
+                    games_lost: state.games_lost,
+                };
+                auto_save(&save_data);
                 continue;
             } else {
                 break;
@@ -96,6 +107,13 @@ pub fn start_blackjack() {
                     println!("Insurance pays {} coins.", payout);
                 }
                 state.games_lost += 1;
+                // Auto-save after dealer blackjack
+                let save_data = SaveData {
+                    money: state.money,
+                    games_won: state.games_won,
+                    games_lost: state.games_lost,
+                };
+                auto_save(&save_data);
                 continue; // end round immediately
             } else {
                 println!("Dealer does not have blackjack.");
@@ -164,6 +182,14 @@ fn determine_winner(state: &mut GameState) {
             state.money += state.bet;
         }
     }
+    
+    // Auto-save after each round
+    let save_data = SaveData {
+        money: state.money,
+        games_won: state.games_won,
+        games_lost: state.games_lost,
+    };
+    auto_save(&save_data);
 }
 
 fn dealer_wins(state: &mut GameState) {
