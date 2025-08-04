@@ -16,6 +16,7 @@ impl Default for SaveData {
             money: 100, // Starting money
             games_won: 0,
             games_lost: 0,
+            //this is for me to have a seperate commit for the save system
         }
     }
 }
