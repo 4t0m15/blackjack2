@@ -1,5 +1,5 @@
 use crate::art_handler::{get_message, get_splash_screen, print_game_status};
-use crate::save_system::{auto_save, create_save_data, load_save_data, STARTING_MONEY};
+use crate::save_system::{auto_save, create_save_data, load_save_data, SaveData, STARTING_MONEY};
 use rand::seq::SliceRandom;
 use rand::thread_rng;
 use std::io::{self, Write};
