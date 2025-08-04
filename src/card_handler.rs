@@ -70,6 +70,38 @@ pub fn start_blackjack() {
         state.money -= state.bet;
         println!("{}", get_message("Dealer shows", Some(&state)));
         print_player_cards(&state);
+
+        // Insurance offer when dealer shows an Ace
+        let mut insurance_bet = 0;
+        if state.dealer_cards[0].split_whitespace().next().unwrap() == "A" {
+            print!("Dealer shows an Ace - do you want insurance (y/n)? ");
+            io::stdout().flush().ok();
+            let ans = read_char();
+            if ans == 'y' {
+                insurance_bet = state.bet / 2;
+                if insurance_bet > 0 && state.money >= insurance_bet {
+                    state.money -= insurance_bet;
+                    println!("Insurance bet of {} placed.", insurance_bet);
+                } else {
+                    println!("Not enough money for insurance.");
+                    insurance_bet = 0;
+                }
+            }
+            // Check for dealer blackjack
+            if hand_value(&state.dealer_cards) == 21 {
+                println!("Dealer has blackjack!");
+                if insurance_bet > 0 {
+                    let payout = insurance_bet * 3;
+                    state.money += payout;
+                    println!("Insurance pays {} coins.", payout);
+                }
+                state.games_lost += 1;
+                continue; // end round immediately
+            } else {
+                println!("Dealer does not have blackjack.");
+            }
+        }
+
         if player_turn(&mut state) {
             enemy_ai_handler::dealer_turn(&mut state);
             determine_winner(&mut state);
