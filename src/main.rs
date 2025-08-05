@@ -13,6 +13,7 @@ struct BlackJack {
     menu: Menu,
 }
 
+//"no boilerplate in rust", yeah right!
 impl BlackJack {
     fn new() -> Self {
         BlackJack { menu: Menu::new() }

@@ -1,4 +1,4 @@
-use crate::art_handler::{get_message, get_splash_screen, print_game_status};
+use crate::art_handler::{get_message, get_splash_screen, print_game_status, get_error_message, get_action_message};
 use crate::save_system::{auto_save, create_save_data, load_save_data, SaveData, STARTING_MONEY};
 use rand::seq::SliceRandom;
 use rand::thread_rng;
@@ -52,8 +52,6 @@ pub fn start_blackjack() {
     print_splash_screen();
     delay();
     loop {
-        print!("{}\n", get_message("You have", Some(&state)));
-        io::stdout().flush().ok();
         if state.money <= 0 {
             println!("\x1b[1;31m{}\x1b[0m", get_message("Game Over", None));
             print!("{} ", get_message("Do you want to (t)ry again", None));
@@ -83,26 +81,26 @@ pub fn start_blackjack() {
         if state.dealer_cards.first()
             .and_then(|card| card.split_whitespace().next())
             .map_or(false, |rank| rank == "A") {
-            print!("Dealer shows an Ace - do you want insurance (y/n)? ");
+            print!("{} ", get_action_message("Dealer shows an Ace", None));
             io::stdout().flush().ok();
             let ans = read_char();
             if ans == 'y' {
                 insurance_bet = state.bet / 2;
                 if insurance_bet > 0 && state.money >= insurance_bet {
                     state.money -= insurance_bet;
-                    println!("Insurance bet of {} placed.", insurance_bet);
+                    println!("{}", get_action_message("Insurance bet", Some(&state)));
                 } else {
-                    println!("Not enough money for insurance.");
+                    println!("{}", get_error_message("Not enough money for insurance"));
                     insurance_bet = 0;
                 }
             }
             // Check for dealer blackjack
             if hand_value(&state.dealer_cards) == 21 {
-                println!("Dealer has blackjack!");
+                println!("{}", get_action_message("Dealer has blackjack", None));
                 if insurance_bet > 0 {
                     let payout = insurance_bet * 3;
                     state.money += payout;
-                    println!("Insurance pays {} coins.", payout);
+                    println!("{}", get_action_message("Insurance pays", Some(&state)));
                 }
                 state.games_lost += 1;
                 // Auto-save after dealer blackjack
@@ -110,7 +108,7 @@ pub fn start_blackjack() {
                 auto_save(&save_data);
                 continue; // end round immediately
             } else {
-                println!("Dealer does not have blackjack.");
+                println!("{}", get_action_message("Dealer does not have blackjack", None));
             }
         }
 
@@ -147,7 +145,7 @@ fn setup_new_round(state: &mut GameState) {
 
 fn get_bet(state: &GameState) -> i32 {
     loop {
-        print!("How many coins do you want to bet? ");
+        print!("{} ", get_message("How many coins", None));
         io::stdout().flush().ok();
         let mut line = String::new();
         io::stdin().read_line(&mut line).ok();
@@ -156,7 +154,7 @@ fn get_bet(state: &GameState) -> i32 {
                 return n;
             }
         }
-        println!("Please bet between 1 and {} coins.", state.money);
+        println!("{}", get_message("Please bet between", Some(state)));
     }
 }
 

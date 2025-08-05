@@ -132,4 +132,50 @@ Dealer Wins!
 loading...
 
 // --- Main Menu Prompt (from main.rs) ---
-Choose an option: (a)bout, (n)ew game, (h)elp, (g)uide:
+Choose an option: (a)bout, (n)ew game, (h)elp, (g)uide, (q)uit:
+
+// --- About Text (from main_menu.rs) ---
+About: A simple text-based blackjack game written in Rust.
+Work is CC0 - If you paid for it, you should request a refund.
+Source code is found at: (https://github.com/4t0m15/blackjack2).
+Created by Arsen Martirosyan.
+
+// --- Help Text (from main_menu.rs) ---
+Controls: 
+n - Game Start
+a - About
+h - Help (where you are now)
+g - Guide
+q - Quit
+
+Game Instructions:
+THE PLAYER is served a card by a DEALER.
+THE PLAYER can choose to HIT and get a card.
+Although this can lead the player to BUST.
+A BUST is when THE PLAYER'S cards go over 21.
+The DEALER will also be served a card.
+The idea is to have more than the DEALER, but not BUST.
+
+// --- Error Messages (from various files) ---
+Invalid option. Please try again.
+Warning: Unknown card rank in '{{card}}', using default
+Warning: Invalid card format: {{card}}
+Not enough money for insurance.
+Not enough money to double down!
+Invalid action, please choose again.
+Please type 'h', 's', or 'd'.
+
+// --- Game Actions (from player_handler.rs) ---
+Choose an action: (h)it, (s)tand
+Choose an action: (h)it, (s)tand, (d)ouble down
+You doubled down and drew: {{card}}
+You busted! Dealer wins.
+Insurance bet of {{bet}} placed.
+Insurance pays {{payout}} coins.
+Dealer has blackjack!
+Dealer does not have blackjack.
+Dealer shows an Ace - do you want insurance (y/n)?
+
+// --- Status Messages (from art_handler.rs) ---
+You have {{money}} coins
+Games won: {{gamesWon}} | Games lost: {{gamesLost}}

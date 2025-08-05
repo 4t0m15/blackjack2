@@ -6,7 +6,7 @@ impl ShowSplash {
 }
 
 pub fn print_menu() {
-    println!("Choose an option: (a)bout, (n)ew game, (h)elp, (g)uide, (q)uit: ");
+    println!("{}", crate::art_handler::get_menu_prompt());
 }
 
 pub fn read_menu_input() -> String {
@@ -20,5 +20,5 @@ pub fn read_menu_input() -> String {
 }
 
 pub fn print_invalid_option() {
-    println!("Invalid option. Please try again.");
+    println!("{}", crate::art_handler::get_error_message("Invalid option"));
 }
