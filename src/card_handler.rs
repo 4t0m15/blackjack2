@@ -3,6 +3,7 @@ use crate::game_history::{GameHistory, GameOutcome, GameRound};
 use chrono::Local;
 use rand::seq::SliceRandom;
 use rand::thread_rng;
+use std::fs;
 use std::io::{self, Write};
 use std::thread;
 use std::time::Duration;
@@ -87,6 +88,9 @@ pub fn start_blackjack_with_state(state: &mut GameState) {
         print_game_status(&state);
         state.current_round_start_money = state.money;
         state.bet = get_bet(&state);
+        if state.bet == -1 {
+            break;
+        }
         state.money -= state.bet;
         state.was_double_down = false;
         println!("{}", get_message("Dealer shows", Some(&state)));
@@ -124,11 +128,17 @@ fn setup_new_round(state: &mut GameState) {
 
 fn get_bet(state: &GameState) -> i32 {
     loop {
-        print!("How many coins do you want to bet? ");
+        print!("How many coins do you want to bet? (m to return to main menu): ");
         io::stdout().flush().ok();
         let mut line = String::new();
         io::stdin().read_line(&mut line).ok();
-        if let Ok(n) = line.trim().parse::<i32>() {
+
+        let trimmed = line.trim();
+        if trimmed.eq_ignore_ascii_case("m") {
+            return -1; // Special value to indicate returning to menu
+        }
+
+        if let Ok(n) = trimmed.parse::<i32>() {
             if n > 0 && n <= state.money {
                 return n;
             }
@@ -198,6 +208,17 @@ fn record_game_result(state: &mut GameState, outcome: GameOutcome) {
     };
 
     state.history.add_round(round);
+
+    // Automatically save game history to CSV file
+    let csv_content = state.history.export_to_csv();
+
+    // Create path relative to the project directory
+    let mut path = std::env::current_dir().unwrap_or_default();
+    path.push("stats.csv");
+
+    if let Err(e) = fs::write(&path, csv_content) {
+        eprintln!("Failed to save game history to stats.csv: {}", e);
+    }
 }
 
 pub fn read_char() -> char {

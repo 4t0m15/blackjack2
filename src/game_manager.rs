@@ -2,6 +2,7 @@ use crate::card_handler::{start_blackjack_with_state, GameState};
 use crate::game_history::GameHistory;
 use crate::menu_handling::MenuAction;
 use crate::text_handler;
+
 use std::io::{self, Write};
 
 pub struct GameManager {
@@ -57,19 +58,13 @@ impl GameManager {
     }
 
     fn start_new_game(&mut self) {
-        // Create a new game state or reuse existing one
         if self.game_state.is_none() {
             self.game_state = Some(GameState::new());
         }
 
         if let Some(ref mut state) = self.game_state {
-            // Transfer history to the game state
             state.history = self.history.clone();
-
-            // Start the blackjack game
             start_blackjack_with_state(state);
-
-            // Update our history with the results
             self.history = state.history.clone();
         }
     }

@@ -112,7 +112,7 @@ Do you want to (t)ry again or (q)uit?
 Dealer shows: [{{dealerCard}}, Hidden]
 Your cards: {{playerCards}}
 Your total: {{playerTotal}}
-How many coins do you want to bet?
+How many coins do you want to bet? (m to return to main menu)
 Please bet between 1 and {{money}} coins.
 You have {{money}} coins
 Games won: {{gamesWon}} | Games lost: {{gamesLost}}

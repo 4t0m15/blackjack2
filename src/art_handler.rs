@@ -10,7 +10,10 @@ pub fn load_art_sections() -> HashMap<String, Vec<String>> {
     let content = match fs::read_to_string(&art_path) {
         Ok(content) => content,
         Err(e) => {
-            eprintln!("Warning: Failed to read art.txt file: {}. Using default values.", e);
+            eprintln!(
+                "Warning: Failed to read art.txt file: {}. Using default values.",
+                e
+            );
             return HashMap::new();
         }
     };
@@ -40,7 +43,7 @@ pub fn get_card_art() -> Vec<String> {
         Some(lines) => lines,
         None => {
             eprintln!("Warning: Card art section missing. Using fallback.");
-            return vec!["[CARD]".to_string(); 13]; // 13 different card ranks
+            return vec!["[CARD]".to_string(); 13];
         }
     };
     let mut cards = Vec::new();
@@ -62,7 +65,9 @@ pub fn get_card_art() -> Vec<String> {
 
 pub fn get_splash_screen() -> String {
     let sections = load_art_sections();
-    let splash_lines = match sections.get("// --- Splash Screen ASCII Art (from card_handler.rs and text_handler.rs) ---") {
+    let splash_lines = match sections
+        .get("// --- Splash Screen ASCII Art (from card_handler.rs and text_handler.rs) ---")
+    {
         Some(lines) => lines,
         None => {
             eprintln!("Warning: Splash screen section missing. Using fallback.");
@@ -74,13 +79,14 @@ pub fn get_splash_screen() -> String {
 
 pub fn get_message(key: &str, state: Option<&GameState>) -> String {
     let sections = load_art_sections();
-    let msg_lines = match sections.get("// --- Game Prompts and Messages (from card_handler.rs) ---") {
-        Some(lines) => lines,
-        None => {
-            eprintln!("Warning: Messages section missing. Using fallback.");
-            return format!("[{}]", key);
-        }
-    };
+    let msg_lines =
+        match sections.get("// --- Game Prompts and Messages (from card_handler.rs) ---") {
+            Some(lines) => lines,
+            None => {
+                eprintln!("Warning: Messages section missing. Using fallback.");
+                return format!("[{}]", key);
+            }
+        };
     for line in msg_lines {
         if line.contains(key) {
             let mut msg = line.to_string();
@@ -108,7 +114,7 @@ pub fn get_message(key: &str, state: Option<&GameState>) -> String {
 }
 
 pub fn print_game_status(state: &GameState) {
-    println!("{}", get_message("You have", Some(state)));
+    println!("\n{}", get_message("You have", Some(state)));
 }
 
 pub fn get_menu_prompt() -> String {
@@ -144,22 +150,26 @@ pub fn get_help_text(help_type: &str) -> String {
             return "Help information not available.".to_string();
         }
     };
-    
+
     let mut result = Vec::new();
     let mut in_section = false;
-    
+
     for line in help_lines {
         if line.starts_with("Controls:") {
             in_section = help_type == "controls";
-            if in_section { result.push(line.clone()); }
+            if in_section {
+                result.push(line.clone());
+            }
         } else if line.starts_with("Game Instructions:") {
             in_section = help_type == "instructions";
-            if in_section { result.push(line.clone()); }
+            if in_section {
+                result.push(line.clone());
+            }
         } else if in_section {
             result.push(line.clone());
         }
     }
-    
+
     if result.is_empty() {
         format!("No {} help available.", help_type)
     } else {
@@ -176,7 +186,7 @@ pub fn get_error_message(error_key: &str) -> String {
             return format!("Error: {}", error_key);
         }
     };
-    
+
     for line in error_lines {
         if line.contains(error_key) {
             return line.clone();
@@ -194,18 +204,20 @@ pub fn get_action_message(action_key: &str, state: Option<&GameState>) -> String
             return format!("[{}]", action_key);
         }
     };
-    
+
     for line in action_lines {
         if line.contains(action_key) {
             let mut msg = line.to_string();
             if let Some(s) = state {
                 msg = msg
-                    .replace("{{card}}", &s.player_cards.last().unwrap_or(&"".to_string()))
+                    .replace(
+                        "{{card}}",
+                        &s.player_cards.last().unwrap_or(&"".to_string()),
+                    )
                     .replace("{{bet}}", &s.bet.to_string());
-                
-                // Handle insurance payout calculation
+
                 if msg.contains("{{payout}}") {
-                    let payout = s.bet * 3; // 3:1 payout for insurance
+                    let payout = s.bet * 3;
                     msg = msg.replace("{{payout}}", &payout.to_string());
                 }
             }

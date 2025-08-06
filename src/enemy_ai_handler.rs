@@ -19,7 +19,6 @@ pub fn dealer_turn(state: &mut crate::card_handler::GameState) {
             .collect::<Vec<_>>()
     );
     let card_art = get_card_art();
-    // Print the ASCII art for each dealer card side by side
     let card_arts: Vec<Vec<&str>> = state
         .dealer_cards
         .iter()
