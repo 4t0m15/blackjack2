@@ -1,0 +1,2 @@
+Round,Timestamp,Bet,PlayerCards,DealerCards,PlayerTotal,DealerTotal,Outcome,MoneyChange,MoneyAfter,DoubleDown,PlayerBust,DealerBust
+1,2025-08-06 01:16:05,5,"5 Hearts | J Spades | A Spades","8 Hearts | J Clubs",16,18,Dealer Win,-5,5,false,false,false
