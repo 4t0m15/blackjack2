@@ -26,7 +26,7 @@ impl GameState {
     #[must_use]
     pub fn new() -> Self {
         let save_data = crate::save_system::load_save_data();
-        
+
         GameState {
             card_deck: Vec::new(),
             player_cards: Vec::new(),
@@ -43,14 +43,11 @@ impl GameState {
             was_double_down: false,
         }
     }
-    
+
     /// Save the current game state to disk
     pub fn save_to_disk(&self) {
-        let save_data = crate::save_system::create_save_data(
-            self.money,
-            self.games_won,
-            self.games_lost,
-        );
+        let save_data =
+            crate::save_system::create_save_data(self.money, self.games_won, self.games_lost);
         crate::save_system::auto_save(&save_data);
     }
 }

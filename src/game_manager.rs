@@ -92,7 +92,7 @@ impl GameManager {
         start_blackjack_with_state(&mut state);
         self.history = state.history.clone();
         self.game_state = Some(state);
-        
+
         // Save the updated state after the game session
         if let Some(ref game_state) = self.game_state {
             game_state.save_to_disk();
