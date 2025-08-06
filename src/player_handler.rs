@@ -5,22 +5,8 @@ use std::io::{self, Write};
 
 #[must_use]
 pub fn hand_value(hand: &[String]) -> i32 {
-    let mut total = 0;                if hand1_busted && hand2_busted {
-                    println!("Both hands busted!");
-                    state.games_lost += 1;
-                    return false;
-                } else if hand1_busted {
-                    println!("Hand 1 busted, but Hand 2 is still alive.");
-                    // Keep Hand 2 as the main hand
-                    state.player_cards = hand2;
-                    state.player_card_count = state.player_cards.len() as i32;
-                    return true;
-                } else if hand2_busted {
-                    println!("Hand 2 busted, but Hand 1 is still alive.");
-                    // Keep Hand 1 as the main hand
-                    state.player_cards = hand1;
-                    state.player_card_count = state.player_cards.len() as i32;
-                    return true;s = 0;
+    let mut total = 0;
+    let mut aces = 0;
     for card in hand {
         let Some(rank) = card.split_whitespace().next() else {
             eprintln!("{}", get_error_message("Invalid card format"));
@@ -246,8 +232,7 @@ pub fn player_turn(state: &mut GameState) -> bool {
 
                 // Determine outcome
                 if hand1_busted && hand2_busted {
-                    println!("Both hands busted! Dealer wins.");
-                    state.games_lost += 1;
+                    println!("Both hands busted!");
                     return false;
                 } else if hand1_busted {
                     println!("Hand 1 busted, but Hand 2 is still alive.");
@@ -288,7 +273,6 @@ pub fn player_turn(state: &mut GameState) -> bool {
             'u' if state.player_card_count == 2 => {
                 println!("You surrendered. Half your bet is returned.");
                 state.money += state.bet / 2;
-                state.games_lost += 1;
                 return false;
             }
             'u' if state.player_card_count != 2 => {
