@@ -1,20 +1,11 @@
 use crate::game_state::GameState;
 use crate::player_handler::hand_value;
 use std::collections::HashMap;
-use std::fs;
-use std::path::PathBuf;
 
 #[must_use]
 pub fn load_art_sections() -> HashMap<String, Vec<String>> {
-    let mut art_path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-    art_path.push("src/art.txt");
-    let content = match fs::read_to_string(&art_path) {
-        Ok(content) => content,
-        Err(e) => {
-            eprintln!("Warning: Failed to read art.txt file: {e}. Using default values.");
-            return HashMap::new();
-        }
-    };
+    // Embed the art file directly into the binary at compile time
+    let content = include_str!("art.txt");
     let mut sections = HashMap::new();
     let mut current_section = String::new();
     let mut current_lines = Vec::new();
