@@ -67,29 +67,28 @@ jobs:
           body: |
             ## Blackjack2 Auto-Release ${{ steps.version.outputs.VERSION }}
 
-            🎮 **Console-based Blackjack game written in Rust**
+            Console-based Blackjack game written in Rust
 
-            📁 **File size:** ${{ steps.get_size.outputs.SIZE_KB }} KB (${{ steps.get_size.outputs.SIZE_MB }} MB)
-            📅 **Build date:** ${{ github.event.head_commit.timestamp }}
-            🔗 **Commit:** ${{ github.sha }}
+            **File size:** ${{ steps.get_size.outputs.SIZE_KB }} KB (${{ steps.get_size.outputs.SIZE_MB }} MB)
+            **Build date:** ${{ github.event.head_commit.timestamp }}
+            **Commit:** ${{ github.sha }}
 
-            ### 📥 Download
-            Download the `blackjack2.exe` file below and run it directly - no installation required!
+            ### Download
+            Download the blackjack2.exe file below and run it directly - no installation required!
 
-            ### 💻 System Requirements
+            ### System Requirements
             - Windows (x64)
             - No additional dependencies required
 
-            ### 🚀 How to Run
-            1. Download `blackjack2.exe`
+            ### How to Run
+            1. Download blackjack2.exe
             2. Double-click to run, or run from command line
             3. Enjoy playing Blackjack!
 
-            ### 📝 Latest Changes
+            ### Latest Changes
             ${{ github.event.head_commit.message }}
 
-            ---
-            *This release was automatically generated from the latest push to main branch.*
+            This release was automatically generated from the latest push to main branch.
           draft: false
           prerelease: false
 
