@@ -1,5 +1,6 @@
 use crate::game_history::GameHistory;
 use crate::text_handler;
+use crate::formatting::BoxFormatter;
 use std::io::{self, Write};
 
 pub struct HistoryMenu<'a> {
@@ -33,15 +34,14 @@ impl<'a> HistoryMenu<'a> {
     }
 
     fn print_history_menu() {
-        println!("\n╔══════════════════════════════════════╗");
-        println!("║            GAME RECORDS              ║");
-        println!("╠══════════════════════════════════════╣");
-        println!("║ (s) Show summary statistics          ║");
-        println!("║ (r) Show recent games                ║");
-        println!("║ (d) Show detailed game               ║");
-        println!("║ (e) Export to CSV                    ║");
-        println!("║ (b) Back to main menu                ║");
-        println!("╚══════════════════════════════════════╝");
+        let mut formatter = BoxFormatter::new(40, "GAME RECORDS");
+        formatter.add_line("(s) Show summary statistics");
+        formatter.add_line("(r) Show recent games");
+        formatter.add_line("(d) Show detailed game");
+        formatter.add_line("(e) Export to CSV");
+        formatter.add_line("(b) Back to main menu");
+        
+        println!("\n{}", formatter.build());
         print!("Choose an option: ");
         io::stdout().flush().ok();
     }

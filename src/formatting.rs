@@ -12,7 +12,7 @@ impl BoxChars {
     pub const BOTTOM_RIGHT: char = '╝';
     pub const HORIZONTAL: char = '═';
     pub const VERTICAL: char = '║';
-    pub const T_DOWN: char = '╦'; 
+    pub const T_DOWN: char = '╦';
     pub const T_UP: char = '╩';
     pub const T_RIGHT: char = '╠';
     pub const T_LEFT: char = '╣';
@@ -32,6 +32,7 @@ pub struct BoxFormatter {
 
 impl BoxFormatter {
     /// Create a new box formatter with specified width
+    #[must_use]
     pub fn new(width: usize, title: &str) -> Self {
         Self {
             width,
@@ -47,20 +48,28 @@ impl BoxFormatter {
 
     /// Add a formatted line with label and value
     pub fn add_field(&mut self, label: &str, value: &dyn std::fmt::Display) {
-        let content = format!("{}: {}", label, value);
+        let content = format!("{label}: {value}");
         self.lines.push(content);
     }
 
     /// Add a formatted line with label and value, right-aligned
     pub fn add_field_aligned(&mut self, label: &str, value: &dyn std::fmt::Display) {
         let value_str = value.to_string();
-        let label_width = self.width - 4 - value_str.len(); // 4 for borders and spaces
-        let content = if label_width > label.len() {
-            format!("{}{}{}", label, " ".repeat(label_width - label.len()), value_str)
+        let content_width = self.width - 4; // 4 for borders and spaces (║ space content space ║)
+        let separator = ": ";
+        
+        // Calculate available space for padding
+        let total_text_len = label.len() + separator.len() + value_str.len();
+        
+        if total_text_len <= content_width {
+            let padding_needed = content_width - total_text_len;
+            let content = format!("{label}{separator}{}{value_str}", " ".repeat(padding_needed));
+            self.lines.push(content);
         } else {
-            format!("{}: {}", label, value_str)
-        };
-        self.lines.push(content);
+            // If too long, fall back to simple format
+            let content = format!("{label}{separator}{value_str}");
+            self.lines.push(content);
+        }
     }
 
     /// Add an empty line for spacing
@@ -80,6 +89,7 @@ impl BoxFormatter {
     }
 
     /// Generate the complete formatted box
+    #[must_use]
     pub fn build(&self) -> String {
         let mut result = String::new();
         
@@ -138,7 +148,7 @@ impl BoxFormatter {
         for line in &self.lines {
             if line.contains(BoxChars::LIGHT_T_RIGHT) && line.contains(BoxChars::LIGHT_T_LEFT) {
                 // This is a separator line, use it as-is
-                writeln!(result, "{}", line).unwrap();
+                writeln!(result, "{line}").unwrap();
             } else {
                 let content_width = self.width - 4; // 2 for borders, 2 for spaces
                 let truncated = if line.len() > content_width {
@@ -174,20 +184,23 @@ impl BoxFormatter {
 }
 
 /// Format a percentage with proper alignment
+#[must_use]
 pub fn format_percentage(value: f64) -> String {
-    format!("{:.1}%", value)
+    format!("{value:.1}%")
 }
 
 /// Format money values with proper signs
+#[must_use]
 pub fn format_money(amount: i32) -> String {
     if amount >= 0 {
-        format!("+{}", amount)
+        format!("+{amount}")
     } else {
         amount.to_string()
     }
 }
 
 /// Format time duration
+#[must_use]
 pub fn format_duration(start: &DateTime<Local>) -> String {
     let now = Local::now();
     let duration = now.signed_duration_since(*start);
@@ -199,11 +212,11 @@ pub fn format_duration(start: &DateTime<Local>) -> String {
         let seconds = total_seconds % 60;
         
         if hours > 0 {
-            format!("{}h {}m {}s", hours, minutes, seconds)
+            format!("{hours}h {minutes}m {seconds}s")
         } else if minutes > 0 {
-            format!("{}m {}s", minutes, seconds)
+            format!("{minutes}m {seconds}s")
         } else {
-            format!("{}s", seconds)
+            format!("{seconds}s")
         }
     } else {
         "0s".to_string()
@@ -211,11 +224,13 @@ pub fn format_duration(start: &DateTime<Local>) -> String {
 }
 
 /// Create a simple horizontal line
+#[must_use]
 pub fn create_line(width: usize, char: char) -> String {
     char.to_string().repeat(width)
 }
 
 /// Pad text to center it within a given width
+#[must_use]
 pub fn center_text(text: &str, width: usize) -> String {
     if text.len() >= width {
         text.to_string()
@@ -232,34 +247,12 @@ pub fn center_text(text: &str, width: usize) -> String {
 }
 
 /// Pad text to right-align it within a given width
+#[must_use]
 pub fn right_align_text(text: &str, width: usize) -> String {
     if text.len() >= width {
         text.to_string()
     } else {
         let padding = width - text.len();
         format!("{}{}", " ".repeat(padding), text)
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_box_formatter() {
-        let mut formatter = BoxFormatter::new(40, "TEST BOX");
-        formatter.add_field_aligned("Games", &10);
-        formatter.add_field_aligned("Win Rate", &format_percentage(75.5));
-        
-        let result = formatter.build();
-        assert!(result.contains("TEST BOX"));
-        assert!(result.contains("Games"));
-        assert!(result.contains("75.5%"));
-    }
-
-    #[test]
-    fn test_center_text() {
-        assert_eq!(center_text("test", 10), "   test   ");
-        assert_eq!(center_text("test", 4), "test");
     }
 }

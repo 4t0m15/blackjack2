@@ -1,2 +1,4 @@
 Round,Timestamp,Bet,PlayerCards,DealerCards,PlayerTotal,DealerTotal,Outcome,MoneyChange,MoneyAfter,DoubleDown,PlayerBust,DealerBust
-1,2025-08-06 10:55:26,5,"K Hearts | 6 Clubs | 3 Diamonds","9 Hearts | 4 Spades | 6 Spades",19,19,Tie,0,10,false,false,false
+1,2025-08-06 12:03:29,5,"K Hearts | 6 Clubs | 3 Diamonds","9 Hearts | 4 Spades | 6 Spades",19,19,Tie,0,10,false,false,false
+2,2025-08-06 12:03:29,5,"3 Spades | 5 Clubs | 8 Clubs | 2 Clubs","Q Diamonds | 2 Spades | J Clubs",18,22,Dealer Bust,5,15,false,false,true
+3,2025-08-06 12:06:52,5,"J Clubs | 2 Spades | 3 Diamonds","10 Spades | 2 Hearts | 7 Clubs",15,19,Dealer Win,-5,5,false,false,false

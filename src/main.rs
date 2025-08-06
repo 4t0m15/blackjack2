@@ -2,6 +2,7 @@ pub mod art_handler;
 pub mod card_handler;
 pub mod deck_manager;
 pub mod enemy_ai_handler;
+pub mod formatting;
 pub mod game_data;
 pub mod game_history;
 pub mod game_history_core;

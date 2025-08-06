@@ -1,26 +1,24 @@
 use crate::game_history_core::GameHistory;
+use crate::formatting::{BoxFormatter, format_percentage, format_money};
 
 impl GameHistory {
     pub fn display_summary(&self) {
-        println!("\n╔══════════════════════════════════════╗");
-        println!("║           GAME HISTORY SUMMARY       ║");
-        println!("╠══════════════════════════════════════╣");
-        println!(
-            "║ Session Start: {}     ║",
-            self.session_start.format("%H:%M:%S")
-        );
-        println!("║ Total Games: {:24} ║", self.total_games_played);
-        println!("║ Wins: {:31} ║", self.total_wins);
-        println!("║ Losses: {:29} ║", self.total_losses);
-        println!("║ Ties: {:31} ║", self.total_ties);
-        println!("║ Win Rate: {:25.1}% ║", self.get_win_rate());
-        println!("║                                      ║");
-        println!("║ Money Won: {:26} ║", self.total_money_won);
-        println!("║ Money Lost: {:25} ║", self.total_money_lost);
-        println!("║ Net Profit: {:25} ║", self.get_net_profit());
-        println!("║ Biggest Win: {:24} ║", self.biggest_win);
-        println!("║ Biggest Loss: {:23} ║", self.biggest_loss);
-        println!("╚══════════════════════════════════════╝\n");
+        let mut formatter = BoxFormatter::new(40, "GAME HISTORY SUMMARY");
+        
+        formatter.add_field_aligned("Session Start", &self.session_start.format("%H:%M:%S"));
+        formatter.add_field_aligned("Total Games", &self.total_games_played);
+        formatter.add_field_aligned("Wins", &self.total_wins);
+        formatter.add_field_aligned("Losses", &self.total_losses);
+        formatter.add_field_aligned("Ties", &self.total_ties);
+        formatter.add_field_aligned("Win Rate", &format_percentage(self.get_win_rate()));
+        formatter.add_empty_line();
+        formatter.add_field_aligned("Money Won", &self.total_money_won);
+        formatter.add_field_aligned("Money Lost", &self.total_money_lost);
+        formatter.add_field_aligned("Net Profit", &self.get_net_profit());
+        formatter.add_field_aligned("Biggest Win", &self.biggest_win);
+        formatter.add_field_aligned("Biggest Loss", &self.biggest_loss);
+        
+        println!("\n{}\n", formatter.build());
     }
 
     pub fn display_recent_games(&self, count: usize) {
@@ -30,50 +28,44 @@ impl GameHistory {
             return;
         }
 
-        println!("\n╔════════════════════════════════════════════════════════════════╗");
-        println!("║                    RECENT GAMES (Last {recent_count})                      ║");
-        println!("╠════════════════════════════════════════════════════════════════╣");
-
+        let mut formatter = BoxFormatter::new(66, &format!("RECENT GAMES (Last {recent_count})"));
+        
         let start_index = self.rounds.len().saturating_sub(recent_count);
         for (i, round) in self.rounds[start_index..].iter().enumerate() {
             let display_number = start_index + i + 1;
-            println!(
-                "║ Game #{:<3} │ {:12} │ Bet: {:3} │ {:19} ║",
-                display_number,
-                round.outcome,
-                round.bet_amount,
-                round.timestamp.format("%H:%M:%S")
+            
+            // Game header
+            formatter.add_field_aligned(
+                &format!("Game #{display_number}"),
+                &format!("{} | Bet: {} | {}", 
+                    round.outcome, 
+                    round.bet_amount, 
+                    round.timestamp.format("%H:%M:%S")
+                )
             );
-
-            println!(
-                "║         │ Player: {:25} ({:2}) ║",
-                format_cards_short(&round.player_cards),
-                round.player_total
+            
+            // Player cards
+            formatter.add_field_aligned(
+                "Player",
+                &format!("{} ({})", format_cards_short(&round.player_cards), round.player_total)
             );
-
-            println!(
-                "║         │ Dealer: {:25} ({:2}) ║",
-                format_cards_short(&round.dealer_cards),
-                round.dealer_total
+            
+            // Dealer cards
+            formatter.add_field_aligned(
+                "Dealer",
+                &format!("{} ({})", format_cards_short(&round.dealer_cards), round.dealer_total)
             );
-
-            let money_display = if round.money_change >= 0 {
-                format!("+{}", round.money_change)
-            } else {
-                format!("{}", round.money_change)
-            };
-
-            println!(
-                "║         │ Money: {:8} │ Total: {:14} ║",
-                money_display, round.money_after
-            );
-
+            
+            // Money change
+            formatter.add_field_aligned("Money Change", &format_money(round.money_change));
+            formatter.add_field_aligned("Total After", &round.money_after);
+            
             if i < recent_count - 1 {
-                println!("║         ├─────────────────────────────────────────────────── ║");
+                formatter.add_separator();
             }
         }
 
-        println!("╚════════════════════════════════════════════════════════════════╝\n");
+        println!("\n{}\n", formatter.build());
     }
 
     pub fn display_detailed_game(&self, round_number: usize) {
@@ -87,49 +79,38 @@ impl GameHistory {
 
         let round = &self.rounds[round_number - 1];
 
-        println!("\n╔══════════════════════════════════════════════════════════════════╗");
-        println!(
-            "║                       GAME #{round_number:<3} DETAILS                        ║"
-        );
-        println!("╠══════════════════════════════════════════════════════════════════╣");
-        println!(
-            "║ Time: {}                                         ║",
-            round.timestamp.format("%Y-%m-%d %H:%M:%S")
-        );
-        println!("║ Bet Amount: {:52} ║", round.bet_amount);
+        let mut formatter = BoxFormatter::new(70, &format!("GAME #{round_number} DETAILS"));
+        
+        formatter.add_field_aligned("Time", &round.timestamp.format("%Y-%m-%d %H:%M:%S"));
+        formatter.add_field_aligned("Bet Amount", &round.bet_amount);
+        
         if round.was_double_down {
-            println!("║ Double Down: Yes                                                 ║");
+            formatter.add_field_aligned("Double Down", &"Yes");
         }
-        println!("║                                                                  ║");
-        println!(
-            "║ Player Cards: {:50} ║",
-            format_cards_long(&round.player_cards)
-        );
-        println!("║ Player Total: {:50} ║", round.player_total);
+        
+        formatter.add_empty_line();
+        formatter.add_field_aligned("Player Cards", &format_cards_long(&round.player_cards));
+        formatter.add_field_aligned("Player Total", &round.player_total);
+        
         if round.player_busted {
-            println!("║ Player Status: BUSTED                                           ║");
+            formatter.add_field_aligned("Player Status", &"BUSTED");
         }
-        println!("║                                                                  ║");
-        println!(
-            "║ Dealer Cards: {:50} ║",
-            format_cards_long(&round.dealer_cards)
-        );
-        println!("║ Dealer Total: {:50} ║", round.dealer_total);
+        
+        formatter.add_empty_line();
+        formatter.add_field_aligned("Dealer Cards", &format_cards_long(&round.dealer_cards));
+        formatter.add_field_aligned("Dealer Total", &round.dealer_total);
+        
         if round.dealer_busted {
-            println!("║ Dealer Status: BUSTED                                           ║");
+            formatter.add_field_aligned("Dealer Status", &"BUSTED");
         }
-        println!("║                                                                  ║");
-        println!("║ Outcome: {:59} ║", round.outcome);
+        
+        formatter.add_empty_line();
+        formatter.add_field_aligned("Outcome", &round.outcome);
 
-        let money_display = if round.money_change >= 0 {
-            format!("+{}", round.money_change)
-        } else {
-            format!("{}", round.money_change)
-        };
+        formatter.add_field_aligned("Money Change", &format_money(round.money_change));
+        formatter.add_field_aligned("Money After", &round.money_after);
 
-        println!("║ Money Change: {money_display:54} ║");
-        println!("║ Money After: {:55} ║", round.money_after);
-        println!("╚══════════════════════════════════════════════════════════════════╝\n");
+        println!("\n{}\n", formatter.build());
     }
 }
 
@@ -160,7 +141,8 @@ fn format_cards_short(cards: &[String]) -> String {
                 }
             })
             .collect();
-        format!("{} +{}", visible.join(" "), cards.len() - 2)
+        let remaining = cards.len() - 2;
+        format!("{} +{remaining}", visible.join(" "))
     }
 }
 

@@ -80,7 +80,6 @@ impl GameHistory {
         }
 
         summary
-
     }
 
     /// Load game history from CSV file.
@@ -93,8 +92,8 @@ impl GameHistory {
             return Ok(GameHistory::new());
         }
 
-        let content = fs::read_to_string(file_path)
-            .map_err(|e| format!("Failed to read CSV file: {e}"))?;
+        let content =
+            fs::read_to_string(file_path).map_err(|e| format!("Failed to read CSV file: {e}"))?;
 
         let mut history = GameHistory::new();
         let lines: Vec<&str> = content.lines().collect();
@@ -126,7 +125,8 @@ impl GameHistory {
             let dealer_busted = parts[12].trim().eq_ignore_ascii_case("true");
 
             // Parse timestamp
-            let timestamp = DateTime::parse_from_str(timestamp_str, "%Y-%m-%d %H:%M:%S").map_or_else(|_| Local::now(), |dt| dt.with_timezone(&Local));
+            let timestamp = DateTime::parse_from_str(timestamp_str, "%Y-%m-%d %H:%M:%S")
+                .map_or_else(|_| Local::now(), |dt| dt.with_timezone(&Local));
 
             // Parse outcome
             let outcome = match outcome_str {
@@ -145,13 +145,19 @@ impl GameHistory {
             let player_cards: Vec<String> = if player_cards_str.is_empty() {
                 Vec::new()
             } else {
-                player_cards_str.split(" | ").map(std::string::ToString::to_string).collect()
+                player_cards_str
+                    .split(" | ")
+                    .map(std::string::ToString::to_string)
+                    .collect()
             };
 
             let dealer_cards: Vec<String> = if dealer_cards_str.is_empty() {
                 Vec::new()
             } else {
-                dealer_cards_str.split(" | ").map(std::string::ToString::to_string).collect()
+                dealer_cards_str
+                    .split(" | ")
+                    .map(std::string::ToString::to_string)
+                    .collect()
             };
 
             let round = GameRound {
