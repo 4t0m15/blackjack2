@@ -1,103 +1,50 @@
-name: Release
+name: Auto Release
 
 on:
   push:
     branches: [main]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
-  build-and-release:
+  release:
     runs-on: windows-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+      - uses: actions/checkout@v4
 
-      - name: Install Rust
+      - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Cache cargo dependencies
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-
-      - name: Build release
+      - name: Build
         run: cargo build --release
 
-      - name: Generate version
-        id: version
+      - name: Generate release info
+        id: info
         run: |
-          $date = Get-Date -Format "yyyy.MM.dd"
-          $commit = "${{ github.sha }}".Substring(0,7)
-          $version = "v$date-$commit"
-          echo "VERSION=$version" >> $env:GITHUB_OUTPUT
-          echo "TAG_NAME=$version" >> $env:GITHUB_OUTPUT
-        shell: pwsh
-
-      - name: Create release directory
-        run: |
-          mkdir release
-          Copy-Item "target\release\blackjack2.exe" "release\blackjack2.exe"
-        shell: pwsh
-
-      - name: Get file size
-        id: get_size
-        run: |
-          $size = (Get-Item "release\blackjack2.exe").Length
-          $sizeKB = [math]::Round($size / 1KB, 2)
-          $sizeMB = [math]::Round($size / 1MB, 2)
-          echo "SIZE_KB=$sizeKB" >> $env:GITHUB_OUTPUT
-          echo "SIZE_MB=$sizeMB" >> $env:GITHUB_OUTPUT
+          $date = Get-Date -Format "yyyy.MM.dd.HHmm"
+          $short_sha = "${{ github.sha }}".Substring(0,7)
+          $version = "build-$date-$short_sha"
+          echo "version=$version" >> $env:GITHUB_OUTPUT
+          echo "date=$date" >> $env:GITHUB_OUTPUT
         shell: pwsh
 
       - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ steps.version.outputs.TAG_NAME }}
-          release_name: Blackjack2 ${{ steps.version.outputs.VERSION }}
+          tag_name: ${{ steps.info.outputs.version }}
+          name: "Blackjack2 ${{ steps.info.outputs.version }}"
           body: |
-            ## Blackjack2 Auto-Release ${{ steps.version.outputs.VERSION }}
+            Automated build from latest commit
 
-            Console-based Blackjack game written in Rust
+            Build date: ${{ steps.info.outputs.date }}
+            Commit: ${{ github.sha }}
 
-            **File size:** ${{ steps.get_size.outputs.SIZE_KB }} KB (${{ steps.get_size.outputs.SIZE_MB }} MB)
-            **Build date:** ${{ github.event.head_commit.timestamp }}
-            **Commit:** ${{ github.sha }}
-
-            ### Download
-            Download the blackjack2.exe file below and run it directly - no installation required!
-
-            ### System Requirements
-            - Windows (x64)
-            - No additional dependencies required
-
-            ### How to Run
-            1. Download blackjack2.exe
-            2. Double-click to run, or run from command line
-            3. Enjoy playing Blackjack!
-
-            ### Latest Changes
-            ${{ github.event.head_commit.message }}
-
-            This release was automatically generated from the latest push to main branch.
+            Download blackjack2.exe and run directly - no installation needed!
+          files: target/release/blackjack2.exe
           draft: false
           prerelease: false
-
-      - name: Upload Release Asset
-        uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./release/blackjack2.exe
-          asset_name: blackjack2.exe
-          asset_content_type: application/octet-stream
