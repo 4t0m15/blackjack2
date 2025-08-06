@@ -47,7 +47,7 @@ impl GameHistory {
         summary.push_str(&format!("Net Profit: {}\n", self.get_net_profit()));
         summary.push_str(&format!("Biggest Win: {}\n", self.biggest_win));
         summary.push_str(&format!("Biggest Loss: {}\n", self.biggest_loss));
-        summary.push_str("\n");
+        summary.push('\n');
 
         if !self.rounds.is_empty() {
             summary.push_str("RECENT GAMES:\n");

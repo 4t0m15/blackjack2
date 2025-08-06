@@ -9,8 +9,8 @@ use std::fs;
 pub fn determine_winner(state: &mut GameState) {
     let p_total = hand_value(&state.player_cards);
     let d_total = hand_value(&state.dealer_cards);
-    println!("Your total: {}", p_total);
-    println!("Dealer's total: {}", d_total);
+    println!("Your total: {p_total}");
+    println!("Dealer's total: {d_total}");
 
     let outcome = match (p_total > 21, d_total > 21, p_total.cmp(&d_total)) {
         (_, true, _) => {
@@ -75,6 +75,6 @@ fn record_game_result(state: &mut GameState, outcome: GameOutcome) {
     path.push("stats.csv");
 
     if let Err(e) = fs::write(&path, csv_content) {
-        eprintln!("Failed to save game history to stats.csv: {}", e);
+        eprintln!("Failed to save game history to stats.csv: {e}");
     }
 }

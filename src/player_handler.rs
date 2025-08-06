@@ -120,23 +120,23 @@ fn can_split(state: &GameState) -> bool {
 }
 
 fn play_split_hand(hand: &mut Vec<String>, hand_name: &str, state: &mut GameState) -> bool {
-    println!("\n--- Playing {} ---", hand_name);
+    println!("\n--- Playing {hand_name} ---");
 
     // Draw one card for this hand
     let card = draw(state);
     hand.push(card.clone());
-    println!("Drew: {}", card);
+    println!("Drew: {card}");
     print_hand_cards(hand, hand_name);
 
     // Check for blackjack (21 with 2 cards)
     if hand.len() == 2 && hand_value(hand) == 21 {
-        println!("Blackjack on {}!", hand_name);
+        println!("Blackjack on {hand_name}!");
         return false; // No bust, stand automatically
     }
 
     // Play this hand
     loop {
-        print!("Choose action for {}: (h)it, (s)tand: ", hand_name);
+        print!("Choose action for {hand_name}: (h)it, (s)tand: ");
         io::stdout().flush().ok();
 
         let action = read_char();
@@ -144,11 +144,11 @@ fn play_split_hand(hand: &mut Vec<String>, hand_name: &str, state: &mut GameStat
             'h' => {
                 let card = draw(state);
                 hand.push(card.clone());
-                println!("You got: {}", card);
+                println!("You got: {card}");
                 print_hand_cards(hand, hand_name);
 
                 if hand_value(hand) > 21 {
-                    println!("{} busted!", hand_name);
+                    println!("{hand_name} busted!");
                     return true; // Busted
                 }
             }
@@ -181,7 +181,7 @@ pub fn player_turn(state: &mut GameState) -> bool {
                 let card = draw(state);
                 state.player_cards.push(card.clone());
                 state.player_card_count = state.player_cards.len() as i32;
-                println!("You got: {}", card);
+                println!("You got: {card}");
                 print_player_cards(state);
 
                 if hand_value(&state.player_cards) > 21 {
@@ -198,7 +198,7 @@ pub fn player_turn(state: &mut GameState) -> bool {
                 let card = draw(state);
                 state.player_cards.push(card.clone());
                 state.player_card_count = state.player_cards.len() as i32;
-                println!("You doubled down and drew: {}", card);
+                println!("You doubled down and drew: {card}");
                 print_player_cards(state);
 
                 if hand_value(&state.player_cards) > 21 {
@@ -250,16 +250,10 @@ pub fn player_turn(state: &mut GameState) -> bool {
                     let hand2_total = hand_value(&hand2);
 
                     if hand1_total >= hand2_total {
-                        println!(
-                            "Using Hand 1 (total: {}) for dealer comparison.",
-                            hand1_total
-                        );
+                        println!("Using Hand 1 (total: {hand1_total}) for dealer comparison.");
                         state.player_cards = hand1;
                     } else {
-                        println!(
-                            "Using Hand 2 (total: {}) for dealer comparison.",
-                            hand2_total
-                        );
+                        println!("Using Hand 2 (total: {hand2_total}) for dealer comparison.");
                         state.player_cards = hand2;
                     }
                     state.player_card_count = state.player_cards.len() as i32;

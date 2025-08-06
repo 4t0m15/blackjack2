@@ -9,7 +9,7 @@ pub fn dealer_turn(state: &mut GameState) {
         let card = draw(state);
         state.dealer_cards.push(card.clone());
         state.dealer_card_count = state.dealer_cards.len() as i32;
-        println!("Dealer draws: {}", card);
+        println!("Dealer draws: {card}");
     }
     println!(
         "Dealer's cards: {:?}",

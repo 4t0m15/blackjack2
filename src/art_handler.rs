@@ -10,10 +10,7 @@ pub fn load_art_sections() -> HashMap<String, Vec<String>> {
     let content = match fs::read_to_string(&art_path) {
         Ok(content) => content,
         Err(e) => {
-            eprintln!(
-                "Warning: Failed to read art.txt file: {}. Using default values.",
-                e
-            );
+            eprintln!("Warning: Failed to read art.txt file: {e}. Using default values.");
             return HashMap::new();
         }
     };
@@ -84,7 +81,7 @@ pub fn get_message(key: &str, state: Option<&GameState>) -> String {
             Some(lines) => lines,
             None => {
                 eprintln!("Warning: Messages section missing. Using fallback.");
-                return format!("[{}]", key);
+                return format!("[{key}]");
             }
         };
     for line in msg_lines {
@@ -110,7 +107,7 @@ pub fn get_message(key: &str, state: Option<&GameState>) -> String {
             return msg;
         }
     }
-    format!("[{}]", key)
+    format!("[{key}]")
 }
 
 pub fn print_game_status(state: &GameState) {
@@ -171,7 +168,7 @@ pub fn get_help_text(help_type: &str) -> String {
     }
 
     if result.is_empty() {
-        format!("No {} help available.", help_type)
+        format!("No {help_type} help available.")
     } else {
         result.join("\n")
     }
@@ -183,7 +180,7 @@ pub fn get_error_message(error_key: &str) -> String {
         Some(lines) => lines,
         None => {
             eprintln!("Warning: Error messages section missing. Using fallback.");
-            return format!("Error: {}", error_key);
+            return format!("Error: {error_key}");
         }
     };
 
@@ -192,7 +189,7 @@ pub fn get_error_message(error_key: &str) -> String {
             return line.clone();
         }
     }
-    format!("Error: {}", error_key)
+    format!("Error: {error_key}")
 }
 
 pub fn get_action_message(action_key: &str, state: Option<&GameState>) -> String {
@@ -201,7 +198,7 @@ pub fn get_action_message(action_key: &str, state: Option<&GameState>) -> String
         Some(lines) => lines,
         None => {
             eprintln!("Warning: Game actions section missing. Using fallback.");
-            return format!("[{}]", action_key);
+            return format!("[{action_key}]");
         }
     };
 
@@ -210,10 +207,7 @@ pub fn get_action_message(action_key: &str, state: Option<&GameState>) -> String
             let mut msg = line.to_string();
             if let Some(s) = state {
                 msg = msg
-                    .replace(
-                        "{{card}}",
-                        &s.player_cards.last().unwrap_or(&"".to_string()),
-                    )
+                    .replace("{{card}}", s.player_cards.last().unwrap_or(&"".to_string()))
                     .replace("{{bet}}", &s.bet.to_string());
 
                 if msg.contains("{{payout}}") {
@@ -224,5 +218,5 @@ pub fn get_action_message(action_key: &str, state: Option<&GameState>) -> String
             return msg;
         }
     }
-    format!("[{}]", action_key)
+    format!("[{action_key}]")
 }

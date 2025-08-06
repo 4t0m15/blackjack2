@@ -31,10 +31,7 @@ impl GameHistory {
         }
 
         println!("\n╔════════════════════════════════════════════════════════════════╗");
-        println!(
-            "║                    RECENT GAMES (Last {})                      ║",
-            recent_count
-        );
+        println!("║                    RECENT GAMES (Last {recent_count})                      ║");
         println!("╠════════════════════════════════════════════════════════════════╣");
 
         let start_index = self.rounds.len().saturating_sub(recent_count);
@@ -92,8 +89,7 @@ impl GameHistory {
 
         println!("\n╔══════════════════════════════════════════════════════════════════╗");
         println!(
-            "║                       GAME #{:<3} DETAILS                        ║",
-            round_number
+            "║                       GAME #{round_number:<3} DETAILS                        ║"
         );
         println!("╠══════════════════════════════════════════════════════════════════╣");
         println!(
@@ -131,7 +127,7 @@ impl GameHistory {
             format!("{}", round.money_change)
         };
 
-        println!("║ Money Change: {:54} ║", money_display);
+        println!("║ Money Change: {money_display:54} ║");
         println!("║ Money After: {:55} ║", round.money_after);
         println!("╚══════════════════════════════════════════════════════════════════╝\n");
     }

@@ -8,11 +8,11 @@ pub fn create_deck() -> Vec<String> {
     ];
     suits
         .iter()
-        .flat_map(|s| ranks.iter().map(move |r| format!("{} {}", r, s)))
+        .flat_map(|s| ranks.iter().map(move |r| format!("{r} {s}")))
         .collect()
 }
 
-pub fn shuffle_deck(deck: &mut Vec<String>) {
+pub fn shuffle_deck(deck: &mut [String]) {
     deck.shuffle(&mut thread_rng());
 }
 

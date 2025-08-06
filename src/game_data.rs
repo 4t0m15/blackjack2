@@ -40,6 +40,7 @@ pub struct GameRound {
 }
 
 impl GameRound {
+    #[allow(clippy::too_many_arguments)]
     pub fn new(
         round_number: u32,
         bet_amount: i32,

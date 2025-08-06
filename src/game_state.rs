@@ -16,6 +16,12 @@ pub struct GameState {
     pub was_double_down: bool,
 }
 
+impl Default for GameState {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl GameState {
     pub fn new() -> Self {
         GameState {

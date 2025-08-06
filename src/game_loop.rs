@@ -33,16 +33,16 @@ pub fn start_blackjack_with_state(state: &mut GameState) {
             }
         }
         setup_new_round(state);
-        print_game_status(&state);
+        print_game_status(state);
         state.current_round_start_money = state.money;
-        state.bet = get_bet(&state);
+        state.bet = get_bet(state);
         if state.bet == -1 {
             break;
         }
         state.money -= state.bet;
         state.was_double_down = false;
-        println!("{}", get_message("Dealer shows", Some(&state)));
-        print_player_cards(&state);
+        println!("{}", get_message("Dealer shows", Some(state)));
+        print_player_cards(state);
         if player_turn(state) {
             enemy_ai_handler::dealer_turn(state);
             determine_winner(state);

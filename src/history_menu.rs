@@ -109,16 +109,16 @@ impl<'a> HistoryMenu<'a> {
                     chrono::Local::now().format("%Y%m%d_%H%M%S")
                 )
             } else {
-                format!("{}.csv", filename)
+                format!("{filename}.csv")
             };
 
             match std::fs::write(&full_filename, csv_content) {
                 Ok(_) => {
-                    println!("✓ History exported successfully to: {}", full_filename);
+                    println!("✓ History exported successfully to: {full_filename}");
                     println!("  Total games exported: {}", self.history.rounds.len());
                 }
                 Err(e) => {
-                    println!("✗ Failed to export history: {}", e);
+                    println!("✗ Failed to export history: {e}");
                 }
             }
         }
