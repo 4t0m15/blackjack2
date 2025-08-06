@@ -1,6 +1,6 @@
+use chrono::{DateTime, Local};
 /// Formatting utilities for creating aligned boxes and text displays
 use std::fmt::Write;
-use chrono::{DateTime, Local};
 
 /// Box drawing characters for consistent formatting
 pub struct BoxChars;
@@ -57,13 +57,16 @@ impl BoxFormatter {
         let value_str = value.to_string();
         let content_width = self.width - 4; // 4 for borders and spaces (║ space content space ║)
         let separator = ": ";
-        
+
         // Calculate available space for padding
         let total_text_len = label.len() + separator.len() + value_str.len();
-        
+
         if total_text_len <= content_width {
             let padding_needed = content_width - total_text_len;
-            let content = format!("{label}{separator}{}{value_str}", " ".repeat(padding_needed));
+            let content = format!(
+                "{label}{separator}{}{value_str}",
+                " ".repeat(padding_needed)
+            );
             self.lines.push(content);
         } else {
             // If too long, fall back to simple format
@@ -82,7 +85,9 @@ impl BoxFormatter {
         let separator = format!(
             "{}{}{}",
             BoxChars::LIGHT_T_RIGHT,
-            BoxChars::LIGHT_HORIZONTAL.to_string().repeat(self.width - 2),
+            BoxChars::LIGHT_HORIZONTAL
+                .to_string()
+                .repeat(self.width - 2),
             BoxChars::LIGHT_T_LEFT
         );
         self.lines.push(separator);
@@ -92,7 +97,7 @@ impl BoxFormatter {
     #[must_use]
     pub fn build(&self) -> String {
         let mut result = String::new();
-        
+
         // Top border with title
         if self.title.is_empty() {
             // Simple top border without title
@@ -204,13 +209,13 @@ pub fn format_money(amount: i32) -> String {
 pub fn format_duration(start: &DateTime<Local>) -> String {
     let now = Local::now();
     let duration = now.signed_duration_since(*start);
-    
+
     if let Ok(std_duration) = duration.to_std() {
         let total_seconds = std_duration.as_secs();
         let hours = total_seconds / 3600;
         let minutes = (total_seconds % 3600) / 60;
         let seconds = total_seconds % 60;
-        
+
         if hours > 0 {
             format!("{hours}h {minutes}m {seconds}s")
         } else if minutes > 0 {

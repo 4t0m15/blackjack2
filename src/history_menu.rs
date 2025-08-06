@@ -1,6 +1,6 @@
+use crate::formatting::BoxFormatter;
 use crate::game_history::GameHistory;
 use crate::text_handler;
-use crate::formatting::BoxFormatter;
 use std::io::{self, Write};
 
 pub struct HistoryMenu<'a> {
@@ -40,7 +40,7 @@ impl<'a> HistoryMenu<'a> {
         formatter.add_line("(d) Show detailed game");
         formatter.add_line("(e) Export to CSV");
         formatter.add_line("(b) Back to main menu");
-        
+
         println!("\n{}", formatter.build());
         print!("Choose an option: ");
         io::stdout().flush().ok();
