@@ -1,0 +1,134 @@
+name: CI Build
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    name: Test Suite
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install Rust
+      uses: dtolnay/rust-toolchain@stable
+
+    - name: Cache cargo dependencies
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+          target
+        key: ${{ runner.os }}-cargo-test-${{ hashFiles('**/Cargo.lock') }}
+
+    - name: Run tests
+      run: cargo test --verbose
+
+    - name: Check formatting
+      run: cargo fmt -- --check
+
+    - name: Run clippy
+      run: cargo clippy -- -D warnings
+
+  build:
+    name: Build
+    needs: test
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            executable-suffix: .exe
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            executable-suffix: ""
+          - os: macos-latest
+            target: x86_64-apple-darwin
+            executable-suffix: ""
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install Rust
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        targets: ${{ matrix.target }}
+
+    - name: Cache cargo dependencies
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+          target
+        key: ${{ runner.os }}-cargo-build-${{ hashFiles('**/Cargo.lock') }}
+
+    - name: Build release
+      run: cargo build --release --target ${{ matrix.target }}
+
+    - name: Prepare artifacts (Windows)
+      if: matrix.os == 'windows-latest'
+      run: |
+        mkdir artifacts
+        Copy-Item "target\${{ matrix.target }}\release\blackjack2.exe" "artifacts\blackjack2-${{ matrix.target }}.exe"
+      shell: pwsh
+
+    - name: Prepare artifacts (Unix)
+      if: matrix.os != 'windows-latest'
+      run: |
+        mkdir -p artifacts
+        cp target/${{ matrix.target }}/release/blackjack2 artifacts/blackjack2-${{ matrix.target }}
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: blackjack2-${{ matrix.target }}
+        path: artifacts/
+        retention-days: 30
+
+  security-audit:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install Rust
+      uses: dtolnay/rust-toolchain@stable
+
+    - name: Install cargo-audit
+      run: cargo install cargo-audit
+
+    - name: Run security audit
+      run: cargo audit
+
+  size-check:
+    name: Binary Size Check
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Download Linux artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: blackjack2-x86_64-unknown-linux-gnu
+
+    - name: Check binary size
+      run: |
+        ls -lh blackjack2-x86_64-unknown-linux-gnu
+        SIZE=$(stat -c%s blackjack2-x86_64-unknown-linux-gnu)
+        echo "Binary size: $SIZE bytes"
+
+        # Warning if binary is larger than 10MB
+        if [ $SIZE -gt 10485760 ]; then
+          echo "⚠️ Warning: Binary size is larger than 10MB"
+        else
+          echo "✅ Binary size is acceptable"
+        fi

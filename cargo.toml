@@ -6,6 +6,13 @@ authors = ["Arsen Martirosyan arsenmartirosyan@protonmail.com>"]
 description = "Console-based Blackjack game in Rust, an improvement by the original Java implementation."
 license = "GPL-3.0"
 
+[profile.release]
+opt-level = "z"     # Optimize for size
+lto = true          # Enable Link Time Optimization
+codegen-units = 1   # Reduce number of codegen units to increase optimizations
+panic = "abort"     # Abort on panic instead of unwinding
+strip = true        # Strip symbols from binary
+
 [dependencies]
 rand = "0.8"
 chrono = { version = "0.4", features = ["clock"] }

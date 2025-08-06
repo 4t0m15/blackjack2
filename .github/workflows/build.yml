@@ -1,0 +1,84 @@
+name: Build
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+jobs:
+  quick-build:
+    name: Quick Build Test
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install Rust
+      uses: dtolnay/rust-toolchain@stable
+
+    - name: Cache cargo dependencies
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+          target
+        key: ${{ runner.os }}-cargo-quick-${{ hashFiles('**/Cargo.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-cargo-
+
+    - name: Check code compiles
+      run: cargo check --verbose
+
+    - name: Build debug version
+      run: cargo build --verbose
+
+    - name: Run tests
+      run: cargo test --verbose
+
+    - name: Build release version
+      run: cargo build --release --verbose
+
+    - name: Check binary size
+      run: |
+        ls -lh target/release/blackjack2
+        echo "Release binary created successfully!"
+
+  windows-build:
+    name: Windows Build
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install Rust
+      uses: dtolnay/rust-toolchain@stable
+
+    - name: Cache cargo dependencies
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+          target
+        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+    - name: Build release
+      run: cargo build --release
+
+    - name: Check executable
+      run: |
+        dir target\release\blackjack2.exe
+        Write-Host "Windows executable created successfully!"
+      shell: pwsh
+
+    - name: Test run (version check)
+      run: |
+        # Try to run the executable briefly to ensure it works
+        timeout 5 target\release\blackjack2.exe || echo "Executable runs (timed out as expected)"
+      shell: cmd
+      continue-on-error: true

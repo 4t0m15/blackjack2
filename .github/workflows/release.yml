@@ -1,0 +1,172 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build for multiple platforms
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            executable: blackjack2.exe
+            asset_name: blackjack2-windows-x64.exe
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            executable: blackjack2
+            asset_name: blackjack2-linux-x64
+          - os: macos-latest
+            target: x86_64-apple-darwin
+            executable: blackjack2
+            asset_name: blackjack2-macos-x64
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Cache cargo dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Build release
+        run: cargo build --release --target ${{ matrix.target }}
+
+      - name: Get version from tag
+        id: get_version
+        run: |
+          if [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          else
+            echo "VERSION=dev-build" >> $GITHUB_OUTPUT
+          fi
+        shell: bash
+
+      - name: Prepare release files (Windows)
+        if: matrix.os == 'windows-latest'
+        run: |
+          mkdir release
+          Copy-Item "target\${{ matrix.target }}\release\${{ matrix.executable }}" "release\${{ matrix.asset_name }}"
+        shell: pwsh
+
+      - name: Prepare release files (Unix)
+        if: matrix.os != 'windows-latest'
+        run: |
+          mkdir -p release
+          cp target/${{ matrix.target }}/release/${{ matrix.executable }} release/${{ matrix.asset_name }}
+          chmod +x release/${{ matrix.asset_name }}
+
+      - name: Get file size
+        id: get_size
+        run: |
+          if [[ "${{ runner.os }}" == "Windows" ]]; then
+            size=$(powershell -Command "(Get-Item 'release/${{ matrix.asset_name }}').Length")
+            sizeKB=$(powershell -Command "[math]::Round($size / 1KB, 2)")
+          else
+            size=$(stat -c%s "release/${{ matrix.asset_name }}")
+            sizeKB=$(echo "scale=2; $size / 1024" | bc)
+          fi
+          echo "SIZE_KB=$sizeKB" >> $GITHUB_OUTPUT
+        shell: bash
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.asset_name }}
+          path: release/${{ matrix.asset_name }}
+
+  release:
+    name: Create GitHub Release
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v3
+
+      - name: Get version from tag
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.get_version.outputs.VERSION }}
+          release_name: Blackjack2 ${{ steps.get_version.outputs.VERSION }}
+          body: |
+            ## Blackjack2 Release ${{ steps.get_version.outputs.VERSION }}
+
+            Console-based Blackjack game written in Rust.
+
+            ### Downloads
+            - **Windows**: `blackjack2-windows-x64.exe` - Double-click to run
+            - **Linux**: `blackjack2-linux-x64` - Run with `./blackjack2-linux-x64`
+            - **macOS**: `blackjack2-macos-x64` - Run with `./blackjack2-macos-x64`
+
+            ### System Requirements
+            - No additional dependencies required
+            - Native binaries for each platform
+
+            ### How to Run
+            1. Download the appropriate file for your operating system
+            2. On Linux/macOS: Make executable with `chmod +x filename`
+            3. Run the executable
+            4. Enjoy playing Blackjack!
+
+            ### Changes in this Release
+            See the commit history for detailed changes.
+          draft: false
+          prerelease: false
+
+      - name: Upload Windows Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./blackjack2-windows-x64.exe/blackjack2-windows-x64.exe
+          asset_name: blackjack2-windows-x64.exe
+          asset_content_type: application/octet-stream
+
+      - name: Upload Linux Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./blackjack2-linux-x64/blackjack2-linux-x64
+          asset_name: blackjack2-linux-x64
+          asset_content_type: application/octet-stream
+
+      - name: Upload macOS Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./blackjack2-macos-x64/blackjack2-macos-x64
+          asset_name: blackjack2-macos-x64
+          asset_content_type: application/octet-stream
