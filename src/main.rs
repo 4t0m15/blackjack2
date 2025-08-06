@@ -22,5 +22,7 @@ use game_manager::GameManager;
 
 fn main() {
     let mut game_manager = GameManager::new();
-    game_manager.run();
+    if let Err(e) = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| game_manager.run())) {
+        eprintln!("GameManager panicked: {:?}", e);
+    }
 }
