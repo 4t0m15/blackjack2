@@ -36,18 +36,12 @@ pub fn load_save_data() -> SaveData {
                     save_data
                 }
                 Err(e) => {
-                    eprintln!(
-                        "⚠ Warning: Could not parse save file ({}). Starting fresh.",
-                        e
-                    );
+                    eprintln!("⚠ Warning: Could not parse save file ({e}). Starting fresh.");
                     SaveData::default()
                 }
             },
             Err(e) => {
-                eprintln!(
-                    "⚠ Warning: Could not read save file ({}). Starting fresh.",
-                    e
-                );
+                eprintln!("⚠ Warning: Could not read save file ({e}). Starting fresh.");
                 SaveData::default()
             }
         }
@@ -66,7 +60,7 @@ pub fn save_game_data(save_data: &SaveData) -> Result<(), Box<dyn std::error::Er
 
 pub fn auto_save(save_data: &SaveData) {
     if let Err(e) = save_game_data(save_data) {
-        eprintln!("⚠ Warning: Could not save game data: {}", e);
+        eprintln!("⚠ Warning: Could not save game data: {e}");
     }
 }
 

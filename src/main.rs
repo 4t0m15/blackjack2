@@ -27,7 +27,7 @@ fn main() {
             // Game ended normally
         }
         Err(e) => {
-            eprintln!("Game error: {}", e);
+            eprintln!("Game error: {e}");
             std::process::exit(1);
         }
     }
