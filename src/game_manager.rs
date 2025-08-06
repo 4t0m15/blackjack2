@@ -1,13 +1,12 @@
 use crate::card_handler::{start_blackjack_with_state, GameState};
 use crate::game_history::GameHistory;
-use crate::menu_handling::{Menu, MenuAction};
+use crate::menu_handling::MenuAction;
 use crate::text_handler;
 use std::io::{self, Write};
 
 pub struct GameManager {
     pub game_state: Option<GameState>,
     pub history: GameHistory,
-    menu: Menu,
 }
 
 impl GameManager {
@@ -15,7 +14,6 @@ impl GameManager {
         GameManager {
             game_state: None,
             history: GameHistory::new(),
-            menu: Menu::new(),
         }
     }
 
