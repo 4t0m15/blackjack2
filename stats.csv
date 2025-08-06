@@ -1,2 +1,3 @@
 Round,Timestamp,Bet,PlayerCards,DealerCards,PlayerTotal,DealerTotal,Outcome,MoneyChange,MoneyAfter,DoubleDown,PlayerBust,DealerBust
-1,2025-08-06 01:16:05,5,"5 Hearts | J Spades | A Spades","8 Hearts | J Clubs",16,18,Dealer Win,-5,5,false,false,false
+1,2025-08-06 11:33:39,5,"5 Hearts | J Spades | A Spades","8 Hearts | J Clubs",16,18,Dealer Win,-5,5,false,false,false
+2,2025-08-06 11:33:55,5,"9 Hearts | 2 Diamonds | 9 Diamonds","A Clubs | 4 Spades | 4 Clubs",20,19,Player Win,5,15,false,false,false

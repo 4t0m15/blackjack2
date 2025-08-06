@@ -13,9 +13,15 @@ pub struct GameManager {
 impl GameManager {
     #[must_use]
     pub fn new() -> Self {
+        // Try to load existing game history from CSV file
+        let history = GameHistory::load_from_csv("stats.csv").unwrap_or_else(|e| {
+            eprintln!("Warning: Could not load game history: {e}");
+            GameHistory::new()
+        });
+
         GameManager {
             game_state: None,
-            history: GameHistory::new(),
+            history,
         }
     }
 
@@ -65,15 +71,27 @@ impl GameManager {
     }
 
     fn start_new_game(&mut self) {
-        if self.game_state.is_none() {
-            self.game_state = Some(GameState::new());
-        }
+        // Create or reset the game state, but preserve history
+        let mut state = if let Some(mut existing_state) = self.game_state.take() {
+            // Reset game state but keep the history
+            existing_state.player_cards.clear();
+            existing_state.dealer_cards.clear();
+            existing_state.bet = 0;
+            existing_state.player_card_count = 0;
+            existing_state.dealer_card_count = 0;
+            existing_state.deck_index = 0;
+            existing_state.was_double_down = false;
+            existing_state.history = self.history.clone();
+            existing_state
+        } else {
+            let mut new_state = GameState::new();
+            new_state.history = self.history.clone();
+            new_state
+        };
 
-        if let Some(ref mut state) = self.game_state {
-            state.history = self.history.clone();
-            start_blackjack_with_state(state);
-            self.history = state.history.clone();
-        }
+        start_blackjack_with_state(&mut state);
+        self.history = state.history.clone();
+        self.game_state = Some(state);
     }
 
     #[must_use]

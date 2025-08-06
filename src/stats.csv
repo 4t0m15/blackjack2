@@ -1,0 +1,2 @@
+Round,Timestamp,Bet,PlayerCards,DealerCards,PlayerTotal,DealerTotal,Outcome,MoneyChange,MoneyAfter,DoubleDown,PlayerBust,DealerBust
+1,2025-08-06 10:55:26,5,"K Hearts | 6 Clubs | 3 Diamonds","9 Hearts | 4 Spades | 6 Spades",19,19,Tie,0,10,false,false,false

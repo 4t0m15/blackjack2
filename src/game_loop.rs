@@ -26,7 +26,7 @@ pub fn start_blackjack_with_state(state: &mut GameState) {
                 state.money = 10;
                 state.games_won = 0;
                 state.games_lost = 0;
-                state.history = crate::game_history::GameHistory::new();
+                // Don't reset history - keep the game history across restarts
                 continue;
             }
             break;
