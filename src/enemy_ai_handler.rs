@@ -1,7 +1,8 @@
 use crate::art_handler::get_card_art;
+use crate::game_state::GameState;
 use crate::player_handler::{card_art_index, draw, hand_value};
 
-pub fn dealer_turn(state: &mut crate::card_handler::GameState) {
+pub fn dealer_turn(state: &mut GameState) {
     println!("Dealer's turn:");
     println!("Dealer's cards: [{}, Hidden]", state.dealer_cards[0]);
     while hand_value(&state.dealer_cards) < 17 {

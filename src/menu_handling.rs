@@ -1,4 +1,4 @@
-use crate::card_handler;
+use crate::game_loop;
 use crate::main_menu;
 use crate::text_handler;
 
@@ -80,7 +80,7 @@ impl MenuAction {
                 help.show_instructions();
             }
             MenuAction::NewGame => {
-                card_handler::start_blackjack();
+                game_loop::start_blackjack();
             }
             MenuAction::History => {
                 println!("History functionality is handled by GameManager");
