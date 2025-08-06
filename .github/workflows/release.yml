@@ -12,14 +12,37 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  release:
-    runs-on: windows-latest
+  build:
+    name: Build Release Binaries
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            artifact_name: blackjack2.exe
+            release_name: blackjack2-windows-x64.exe
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            artifact_name: blackjack2
+            release_name: blackjack2-linux-x64
+          - os: macos-latest
+            target: x86_64-apple-darwin
+            artifact_name: blackjack2
+            release_name: blackjack2-macos-x64
+          - os: macos-latest
+            target: aarch64-apple-darwin
+            artifact_name: blackjack2
+            release_name: blackjack2-macos-arm64
+
+    runs-on: ${{ matrix.os }}
 
     steps:
       - uses: actions/checkout@v4
 
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
 
       - name: Cache cargo dependencies
         uses: actions/cache@v4
@@ -30,22 +53,61 @@ jobs:
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
             target/
-          key: ${{ runner.os }}-cargo-release-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ runner.os }}-${{ matrix.target }}-cargo-release-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: |
-            ${{ runner.os }}-cargo-
+            ${{ runner.os }}-${{ matrix.target }}-cargo-
 
-      - name: Build
-        run: cargo build --release
+      - name: Build release
+        run: cargo build --release --target ${{ matrix.target }}
+
+      - name: Prepare release artifact (Windows)
+        if: matrix.os == 'windows-latest'
+        run: |
+          Copy-Item "target\${{ matrix.target }}\release\${{ matrix.artifact_name }}" "${{ matrix.release_name }}"
+        shell: pwsh
+
+      - name: Prepare release artifact (Unix)
+        if: matrix.os != 'windows-latest'
+        run: |
+          cp target/${{ matrix.target }}/release/${{ matrix.artifact_name }} ${{ matrix.release_name }}
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.release_name }}
+          path: ${{ matrix.release_name }}
+          retention-days: 1
+
+  release:
+    name: Create Release
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Display structure of downloaded files
+        run: ls -la artifacts/
+
+      - name: Prepare release files
+        run: |
+          mkdir -p release_files
+          find artifacts -name "blackjack2*" -type f -exec cp {} release_files/ \;
+          ls -la release_files/
 
       - name: Generate release info
         id: info
         run: |
-          $date = Get-Date -Format "yyyy.MM.dd.HHmm"
-          $short_sha = "${{ github.sha }}".Substring(0,7)
-          $version = "build-$date-$short_sha"
-          echo "version=$version" >> $env:GITHUB_OUTPUT
-          echo "date=$date" >> $env:GITHUB_OUTPUT
-        shell: pwsh
+          date=$(date -u +"%Y.%m.%d.%H%M")
+          short_sha=$(echo "${{ github.sha }}" | cut -c1-7)
+          version="build-$date-$short_sha"
+          echo "version=$version" >> $GITHUB_OUTPUT
+          echo "date=$date" >> $GITHUB_OUTPUT
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
@@ -53,13 +115,19 @@ jobs:
           tag_name: ${{ steps.info.outputs.version }}
           name: "Blackjack2 ${{ steps.info.outputs.version }}"
           body: |
-            Automated build from latest commit
+            Automated multi-platform build from latest commit
 
             Build date: ${{ steps.info.outputs.date }}
             Commit: ${{ github.sha }}
 
-            Download blackjack2.exe and run directly - no installation needed!
-          files: target/release/blackjack2.exe
+            ## Downloads:
+            - **Windows (x64)**: `blackjack2-windows-x64.exe` - Download and run directly
+            - **Linux (x64)**: `blackjack2-linux-x64` - Make executable with `chmod +x` then run
+            - **macOS (Intel x64)**: `blackjack2-macos-x64` - Make executable with `chmod +x` then run
+            - **macOS (Apple Silicon ARM64)**: `blackjack2-macos-arm64` - Make executable with `chmod +x` then run
+
+            No installation required! Just download the appropriate file for your platform.
+          files: release_files/*
           draft: false
           prerelease: false
         env:
