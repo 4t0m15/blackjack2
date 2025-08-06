@@ -23,7 +23,7 @@ impl Default for GameState {
 }
 
 impl GameState {
-    pub fn new() -> Self {
+    #[must_use] pub fn new() -> Self {
         GameState {
             card_deck: Vec::new(),
             player_cards: Vec::new(),

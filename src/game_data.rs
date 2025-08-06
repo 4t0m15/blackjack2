@@ -41,7 +41,7 @@ pub struct GameRound {
 
 impl GameRound {
     #[allow(clippy::too_many_arguments)]
-    pub fn new(
+    #[must_use] pub fn new(
         round_number: u32,
         bet_amount: i32,
         player_cards: Vec<String>,
@@ -70,25 +70,25 @@ impl GameRound {
         }
     }
 
-    pub fn is_win(&self) -> bool {
+    #[must_use] pub fn is_win(&self) -> bool {
         matches!(
             self.outcome,
             GameOutcome::PlayerWin | GameOutcome::DealerBust
         )
     }
 
-    pub fn is_loss(&self) -> bool {
+    #[must_use] pub fn is_loss(&self) -> bool {
         matches!(
             self.outcome,
             GameOutcome::DealerWin | GameOutcome::PlayerBust
         )
     }
 
-    pub fn is_tie(&self) -> bool {
+    #[must_use] pub fn is_tie(&self) -> bool {
         matches!(self.outcome, GameOutcome::Tie)
     }
 
-    pub fn get_display_outcome(&self) -> String {
+    #[must_use] pub fn get_display_outcome(&self) -> String {
         match self.outcome {
             GameOutcome::PlayerWin => "🎉 WIN".to_string(),
             GameOutcome::DealerWin => "❌ LOSS".to_string(),
@@ -98,7 +98,7 @@ impl GameRound {
         }
     }
 
-    pub fn format_cards_short(&self, cards: &[String]) -> String {
+    #[must_use] pub fn format_cards_short(&self, cards: &[String]) -> String {
         if cards.len() <= 3 {
             cards
                 .iter()
@@ -129,7 +129,7 @@ impl GameRound {
         }
     }
 
-    pub fn format_cards_long(&self, cards: &[String]) -> String {
+    #[must_use] pub fn format_cards_long(&self, cards: &[String]) -> String {
         cards
             .iter()
             .map(|card| {

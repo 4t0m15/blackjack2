@@ -1,6 +1,8 @@
 use crate::game_history_core::GameHistory;
 
 impl GameHistory {
+    #[must_use] 
+    #[allow(clippy::format_push_string)]
     pub fn export_to_csv(&self) -> String {
         let mut csv = String::new();
         csv.push_str("Round,Timestamp,Bet,PlayerCards,DealerCards,PlayerTotal,DealerTotal,Outcome,MoneyChange,MoneyAfter,DoubleDown,PlayerBust,DealerBust\n");
@@ -27,10 +29,17 @@ impl GameHistory {
         csv
     }
 
+    /// Export game history to JSON format.
+    /// 
+    /// # Errors
+    /// 
+    /// Returns an error indicating that JSON export is not implemented.
     pub fn export_to_json(&self) -> Result<String, String> {
         Err("JSON export not implemented - serde_json dependency not available".to_string())
     }
 
+    #[must_use] 
+    #[allow(clippy::format_push_string)]
     pub fn export_summary_to_text(&self) -> String {
         let mut summary = String::new();
         summary.push_str("BLACKJACK GAME SUMMARY\n");

@@ -3,16 +3,13 @@ use crate::game_loop::read_char;
 use crate::game_state::GameState;
 use std::io::{self, Write};
 
-pub fn hand_value(hand: &[String]) -> i32 {
+#[must_use] pub fn hand_value(hand: &[String]) -> i32 {
     let mut total = 0;
     let mut aces = 0;
     for card in hand {
-        let rank = match card.split_whitespace().next() {
-            Some(rank) => rank,
-            None => {
-                eprintln!("{}", get_error_message("Invalid card format"));
-                continue;
-            }
+        let Some(rank) = card.split_whitespace().next() else {
+            eprintln!("{}", get_error_message("Invalid card format"));
+            continue;
         };
         match rank {
             "A" => {
@@ -30,7 +27,7 @@ pub fn hand_value(hand: &[String]) -> i32 {
     total
 }
 
-pub fn card_art_index(card: &str) -> usize {
+#[must_use] pub fn card_art_index(card: &str) -> usize {
     match card.split_whitespace().next() {
         Some("A") => 0,
         Some("2") => 1,
@@ -53,6 +50,7 @@ pub fn card_art_index(card: &str) -> usize {
 }
 
 pub fn draw(state: &mut GameState) -> String {
+    #[allow(clippy::cast_sign_loss)]
     let card = state.card_deck[state.deck_index as usize].clone();
     state.deck_index += 1;
     card
@@ -160,6 +158,7 @@ fn play_split_hand(hand: &mut Vec<String>, hand_name: &str, state: &mut GameStat
     }
 }
 
+#[allow(clippy::too_many_lines, clippy::cast_possible_truncation, clippy::cast_possible_wrap)]
 pub fn player_turn(state: &mut GameState) -> bool {
     loop {
         print!("Choose an action: (h)it, (s)tand");
@@ -244,21 +243,20 @@ pub fn player_turn(state: &mut GameState) -> bool {
                     state.player_cards = hand1;
                     state.player_card_count = state.player_cards.len() as i32;
                     return true;
-                } else {
-                    // Both hands alive - use the better one for comparison
-                    let hand1_total = hand_value(&hand1);
-                    let hand2_total = hand_value(&hand2);
-
-                    if hand1_total >= hand2_total {
-                        println!("Using Hand 1 (total: {hand1_total}) for dealer comparison.");
-                        state.player_cards = hand1;
-                    } else {
-                        println!("Using Hand 2 (total: {hand2_total}) for dealer comparison.");
-                        state.player_cards = hand2;
-                    }
-                    state.player_card_count = state.player_cards.len() as i32;
-                    return true;
                 }
+                // Both hands alive - use the better one for comparison
+                let hand1_total = hand_value(&hand1);
+                let hand2_total = hand_value(&hand2);
+
+                if hand1_total >= hand2_total {
+                    println!("Using Hand 1 (total: {hand1_total}) for dealer comparison.");
+                    state.player_cards = hand1;
+                } else {
+                    println!("Using Hand 2 (total: {hand2_total}) for dealer comparison.");
+                    state.player_cards = hand2;
+                }
+                state.player_card_count = state.player_cards.len() as i32;
+                return true;
             }
             'p' if !can_split(state) => {
                 if state.player_card_count != 2 {

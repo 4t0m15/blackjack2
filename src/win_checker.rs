@@ -57,7 +57,7 @@ fn record_game_result(state: &mut GameState, outcome: GameOutcome) {
         dealer_cards: state.dealer_cards.clone(),
         player_total: p_total,
         dealer_total: d_total,
-        outcome: outcome.clone(),
+        outcome,
         money_change,
         money_after: state.money,
         was_double_down: state.was_double_down,

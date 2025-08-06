@@ -24,7 +24,7 @@ impl Default for SaveData {
     }
 }
 
-pub fn load_save_data() -> SaveData {
+#[must_use] pub fn load_save_data() -> SaveData {
     if Path::new(SAVE_FILE).exists() {
         match fs::read_to_string(SAVE_FILE) {
             Ok(content) => match serde_json::from_str::<SaveData>(&content) {
@@ -51,6 +51,11 @@ pub fn load_save_data() -> SaveData {
     }
 }
 
+/// Save game data to file.
+///
+/// # Errors
+///
+/// Returns an error if serialization or file writing fails.
 pub fn save_game_data(save_data: &SaveData) -> Result<(), Box<dyn std::error::Error>> {
     let json_data = serde_json::to_string_pretty(save_data)?;
     fs::write(SAVE_FILE, json_data)?;
@@ -64,7 +69,7 @@ pub fn auto_save(save_data: &SaveData) {
     }
 }
 
-pub fn create_save_data(money: i32, games_won: i32, games_lost: i32) -> SaveData {
+#[must_use] pub fn create_save_data(money: i32, games_won: i32, games_lost: i32) -> SaveData {
     SaveData {
         money,
         games_won,

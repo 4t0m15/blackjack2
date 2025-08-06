@@ -7,17 +7,14 @@ pub struct HistoryMenu<'a> {
 }
 
 impl<'a> HistoryMenu<'a> {
-    pub fn new(history: &'a GameHistory) -> Self {
+    #[must_use] pub fn new(history: &'a GameHistory) -> Self {
         HistoryMenu { history }
     }
 
     pub fn show_menu(&self) {
         loop {
-            self.print_history_menu();
-            let input = match text_handler::read_menu_input() {
-                Ok(input) => input,
-                Err(_) => break, // Exit on input error
-            };
+            Self::print_history_menu();
+            let Ok(input) = text_handler::read_menu_input() else { break };
 
             match input.trim().to_lowercase().as_str() {
                 "s" => self.show_history_summary(),
@@ -32,7 +29,7 @@ impl<'a> HistoryMenu<'a> {
         }
     }
 
-    fn print_history_menu(&self) {
+    fn print_history_menu() {
         println!("\n╔══════════════════════════════════════╗");
         println!("║            GAME RECORDS              ║");
         println!("╠══════════════════════════════════════╣");
@@ -52,7 +49,7 @@ impl<'a> HistoryMenu<'a> {
         } else {
             self.history.display_summary();
         }
-        self.wait_for_enter();
+        Self::wait_for_enter();
     }
 
     fn show_recent_games(&self) {
@@ -68,7 +65,7 @@ impl<'a> HistoryMenu<'a> {
             let count = input.trim().parse::<usize>().unwrap_or(5);
             self.history.display_recent_games(count);
         }
-        self.wait_for_enter();
+        Self::wait_for_enter();
     }
 
     fn show_detailed_game(&self) {
@@ -87,7 +84,7 @@ impl<'a> HistoryMenu<'a> {
                 println!("Invalid game number!");
             }
         }
-        self.wait_for_enter();
+        Self::wait_for_enter();
     }
 
     fn export_history(&self) {
@@ -113,7 +110,7 @@ impl<'a> HistoryMenu<'a> {
             };
 
             match std::fs::write(&full_filename, csv_content) {
-                Ok(_) => {
+                Ok(()) => {
                     println!("✓ History exported successfully to: {full_filename}");
                     println!("  Total games exported: {}", self.history.rounds.len());
                 }
@@ -122,13 +119,13 @@ impl<'a> HistoryMenu<'a> {
                 }
             }
         }
-        self.wait_for_enter();
+        Self::wait_for_enter();
     }
 
-    fn wait_for_enter(&self) {
+    fn wait_for_enter() {
         println!("\nPress Enter to continue...");
-        let mut _input = String::new();
-        io::stdin().read_line(&mut _input).ok();
+        let mut input = String::new();
+        io::stdin().read_line(&mut input).ok();
     }
 }
 

@@ -23,7 +23,7 @@ use game_manager::GameManager;
 fn main() {
     let mut game_manager = GameManager::new();
     match game_manager.run() {
-        Ok(_) => {
+        Ok(()) => {
             // Game ended normally
         }
         Err(e) => {

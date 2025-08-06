@@ -11,6 +11,11 @@ pub fn print_menu() {
     println!("Choose an option: (a)bout, (n)ew game, (h)elp, (g)uide, (r)ecords, (q)uit: ");
 }
 
+/// Read user input from stdin.
+///
+/// # Errors
+///
+/// Returns an error if reading from stdin fails.
 pub fn read_menu_input() -> Result<String, std::io::Error> {
     let mut input_string = String::new();
     io::stdout().flush().ok();

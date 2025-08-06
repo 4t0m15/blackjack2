@@ -2,6 +2,7 @@ use crate::art_handler::get_card_art;
 use crate::game_state::GameState;
 use crate::player_handler::{card_art_index, draw, hand_value};
 
+#[allow(clippy::cast_possible_truncation, clippy::cast_possible_wrap)]
 pub fn dealer_turn(state: &mut GameState) {
     println!("Dealer's turn:");
     println!("Dealer's cards: [{}, Hidden]", state.dealer_cards[0]);
@@ -16,7 +17,7 @@ pub fn dealer_turn(state: &mut GameState) {
         state
             .dealer_cards
             .iter()
-            .map(|c| c.as_str())
+            .map(std::string::String::as_str)
             .collect::<Vec<_>>()
     );
     let card_art = get_card_art();

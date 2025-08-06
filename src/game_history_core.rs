@@ -18,7 +18,7 @@ pub struct GameRound {
     pub dealer_busted: bool,
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum GameOutcome {
     PlayerWin,
     DealerWin,
@@ -54,7 +54,7 @@ pub struct GameHistory {
 }
 
 impl GameHistory {
-    pub fn new() -> Self {
+    #[must_use] pub fn new() -> Self {
         GameHistory {
             rounds: Vec::new(),
             session_start: Local::now(),
@@ -95,15 +95,15 @@ impl GameHistory {
         self.rounds.push(round);
     }
 
-    pub fn get_win_rate(&self) -> f64 {
+    #[must_use] pub fn get_win_rate(&self) -> f64 {
         if self.total_games_played == 0 {
             0.0
         } else {
-            (self.total_wins as f64 / self.total_games_played as f64) * 100.0
+            (f64::from(self.total_wins) / f64::from(self.total_games_played)) * 100.0
         }
     }
 
-    pub fn get_net_profit(&self) -> i32 {
+    #[must_use] pub fn get_net_profit(&self) -> i32 {
         self.total_money_won - self.total_money_lost
     }
 }

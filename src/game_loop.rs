@@ -28,9 +28,8 @@ pub fn start_blackjack_with_state(state: &mut GameState) {
                 state.games_lost = 0;
                 state.history = crate::game_history::GameHistory::new();
                 continue;
-            } else {
-                break;
             }
+            break;
         }
         setup_new_round(state);
         print_game_status(state);
@@ -60,6 +59,7 @@ fn delay() {
     thread::sleep(Duration::from_secs(2));
 }
 
+#[allow(clippy::cast_possible_truncation, clippy::cast_possible_wrap)]
 fn setup_new_round(state: &mut GameState) {
     state.card_deck = create_and_shuffle_deck();
     state.player_cards.clear();
@@ -94,7 +94,7 @@ fn get_bet(state: &GameState) -> i32 {
     }
 }
 
-pub fn read_char() -> char {
+#[must_use] pub fn read_char() -> char {
     let mut line = String::new();
     io::stdin().read_line(&mut line).ok();
     line.trim().chars().next().unwrap_or('\n')

@@ -18,7 +18,7 @@ pub struct Menu {
 }
 
 impl Menu {
-    pub fn new() -> Self {
+    #[must_use] pub fn new() -> Self {
         Menu {
             current_action: MenuAction::Invalid,
         }
@@ -35,9 +35,8 @@ impl Menu {
     pub fn run_loop(&mut self) {
         loop {
             text_handler::print_menu();
-            let input = match text_handler::read_menu_input() {
-                Ok(input) => input,
-                Err(_) => break, // Exit on input error
+            let Ok(input) = text_handler::read_menu_input() else {
+                break; // Exit on input error
             };
             self.set_action(MenuAction::from_string(&input));
 
@@ -56,7 +55,7 @@ impl Default for Menu {
 }
 
 impl MenuAction {
-    pub fn from_string(input: &str) -> Self {
+    #[must_use] pub fn from_string(input: &str) -> Self {
         match input.trim().to_lowercase().as_str() {
             "a" => MenuAction::About,
             "h" => MenuAction::Help,

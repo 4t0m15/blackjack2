@@ -11,13 +11,18 @@ pub struct GameManager {
 }
 
 impl GameManager {
-    pub fn new() -> Self {
+    #[must_use] pub fn new() -> Self {
         GameManager {
             game_state: None,
             history: GameHistory::new(),
         }
     }
 
+    /// Run the game manager main loop.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if there's an issue reading user input.
     pub fn run(&mut self) -> Result<(), Box<dyn std::error::Error>> {
         let show_splash = text_handler::ShowSplash;
         show_splash.doit();
@@ -70,19 +75,19 @@ impl GameManager {
         }
     }
 
-    pub fn get_history(&self) -> &GameHistory {
+    #[must_use] pub fn get_history(&self) -> &GameHistory {
         &self.history
     }
 
-    pub fn get_win_rate(&self) -> f64 {
+    #[must_use] pub fn get_win_rate(&self) -> f64 {
         self.history.get_win_rate()
     }
 
-    pub fn get_total_games(&self) -> u32 {
+    #[must_use] pub fn get_total_games(&self) -> u32 {
         self.history.total_games_played
     }
 
-    pub fn get_net_profit(&self) -> i32 {
+    #[must_use] pub fn get_net_profit(&self) -> i32 {
         self.history.get_net_profit()
     }
 }
