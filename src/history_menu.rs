@@ -14,7 +14,10 @@ impl<'a> HistoryMenu<'a> {
     pub fn show_menu(&self) {
         loop {
             self.print_history_menu();
-            let input = text_handler::read_menu_input();
+            let input = match text_handler::read_menu_input() {
+                Ok(input) => input,
+                Err(_) => break, // Exit on input error
+            };
 
             match input.trim().to_lowercase().as_str() {
                 "s" => self.show_history_summary(),

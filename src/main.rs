@@ -22,7 +22,13 @@ use game_manager::GameManager;
 
 fn main() {
     let mut game_manager = GameManager::new();
-    if let Err(e) = std::panic::catch_unwind(move || game_manager.run()) {
-        eprintln!("GameManager panicked: {:?}", e);
+    match game_manager.run() {
+        Ok(_) => {
+            // Game ended normally
+        }
+        Err(e) => {
+            eprintln!("Game error: {}", e);
+            std::process::exit(1);
+        }
     }
 }

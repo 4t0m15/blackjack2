@@ -35,7 +35,10 @@ impl Menu {
     pub fn run_loop(&mut self) {
         loop {
             text_handler::print_menu();
-            let input = text_handler::read_menu_input();
+            let input = match text_handler::read_menu_input() {
+                Ok(input) => input,
+                Err(_) => break, // Exit on input error
+            };
             self.set_action(MenuAction::from_string(&input));
 
             if self.current_action == MenuAction::Quit {

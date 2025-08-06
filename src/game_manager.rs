@@ -18,13 +18,13 @@ impl GameManager {
         }
     }
 
-    pub fn run(&mut self) {
+    pub fn run(&mut self) -> Result<(), Box<dyn std::error::Error>> {
         let show_splash = text_handler::ShowSplash;
         show_splash.doit();
 
         loop {
             text_handler::print_menu();
-            let input = text_handler::read_menu_input();
+            let input = text_handler::read_menu_input()?;
             let action = MenuAction::from_string(&input);
 
             match action {
@@ -55,6 +55,7 @@ impl GameManager {
                 }
             }
         }
+        Ok(())
     }
 
     fn start_new_game(&mut self) {
