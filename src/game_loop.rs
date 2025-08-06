@@ -34,7 +34,7 @@ pub fn start_blackjack_with_state(state: &mut GameState) {
             }
             break;
         }
-        
+
         setup_new_round(state);
         print_game_status(state);
         state.current_round_start_money = state.money;
@@ -46,7 +46,7 @@ pub fn start_blackjack_with_state(state: &mut GameState) {
         state.was_double_down = false;
         println!("{}", get_message("Dealer shows", Some(state)));
         print_player_cards(state);
-        
+
         let player_busted = !player_turn(state);
         if player_busted {
             // Player busted, record the result without dealer turn
@@ -56,7 +56,7 @@ pub fn start_blackjack_with_state(state: &mut GameState) {
             enemy_ai_handler::dealer_turn(state);
             determine_winner(state);
         }
-        
+
         // Check if player ran out of money after this round
         if state.money <= 0 {
             println!("\x1b[1;31m{}\x1b[0m", get_message("Game Over", None));
