@@ -94,7 +94,8 @@ fn get_bet(state: &GameState) -> i32 {
     }
 }
 
-#[must_use] pub fn read_char() -> char {
+#[must_use]
+pub fn read_char() -> char {
     let mut line = String::new();
     io::stdin().read_line(&mut line).ok();
     line.trim().chars().next().unwrap_or('\n')

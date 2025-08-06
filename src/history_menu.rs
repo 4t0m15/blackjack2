@@ -7,14 +7,17 @@ pub struct HistoryMenu<'a> {
 }
 
 impl<'a> HistoryMenu<'a> {
-    #[must_use] pub fn new(history: &'a GameHistory) -> Self {
+    #[must_use]
+    pub fn new(history: &'a GameHistory) -> Self {
         HistoryMenu { history }
     }
 
     pub fn show_menu(&self) {
         loop {
             Self::print_history_menu();
-            let Ok(input) = text_handler::read_menu_input() else { break };
+            let Ok(input) = text_handler::read_menu_input() else {
+                break;
+            };
 
             match input.trim().to_lowercase().as_str() {
                 "s" => self.show_history_summary(),

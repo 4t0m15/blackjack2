@@ -24,7 +24,8 @@ impl Default for SaveData {
     }
 }
 
-#[must_use] pub fn load_save_data() -> SaveData {
+#[must_use]
+pub fn load_save_data() -> SaveData {
     if Path::new(SAVE_FILE).exists() {
         match fs::read_to_string(SAVE_FILE) {
             Ok(content) => match serde_json::from_str::<SaveData>(&content) {
@@ -69,7 +70,8 @@ pub fn auto_save(save_data: &SaveData) {
     }
 }
 
-#[must_use] pub fn create_save_data(money: i32, games_won: i32, games_lost: i32) -> SaveData {
+#[must_use]
+pub fn create_save_data(money: i32, games_won: i32, games_lost: i32) -> SaveData {
     SaveData {
         money,
         games_won,

@@ -11,7 +11,8 @@ pub struct GameManager {
 }
 
 impl GameManager {
-    #[must_use] pub fn new() -> Self {
+    #[must_use]
+    pub fn new() -> Self {
         GameManager {
             game_state: None,
             history: GameHistory::new(),
@@ -75,19 +76,23 @@ impl GameManager {
         }
     }
 
-    #[must_use] pub fn get_history(&self) -> &GameHistory {
+    #[must_use]
+    pub fn get_history(&self) -> &GameHistory {
         &self.history
     }
 
-    #[must_use] pub fn get_win_rate(&self) -> f64 {
+    #[must_use]
+    pub fn get_win_rate(&self) -> f64 {
         self.history.get_win_rate()
     }
 
-    #[must_use] pub fn get_total_games(&self) -> u32 {
+    #[must_use]
+    pub fn get_total_games(&self) -> u32 {
         self.history.total_games_played
     }
 
-    #[must_use] pub fn get_net_profit(&self) -> i32 {
+    #[must_use]
+    pub fn get_net_profit(&self) -> i32 {
         self.history.get_net_profit()
     }
 }

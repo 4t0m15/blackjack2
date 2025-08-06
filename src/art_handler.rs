@@ -63,7 +63,8 @@ pub fn get_card_art() -> Vec<String> {
 pub fn get_splash_screen() -> String {
     let sections = load_art_sections();
     let Some(splash_lines) = sections
-        .get("// --- Splash Screen ASCII Art (from card_handler.rs and text_handler.rs) ---") else {
+        .get("// --- Splash Screen ASCII Art (from card_handler.rs and text_handler.rs) ---")
+    else {
         eprintln!("Warning: Splash screen section missing. Using fallback.");
         return "🃏 BLACKJACK 🃏\nWelcome to the game!".to_string();
     };
@@ -73,7 +74,9 @@ pub fn get_splash_screen() -> String {
 #[must_use]
 pub fn get_message(key: &str, state: Option<&GameState>) -> String {
     let sections = load_art_sections();
-    let Some(msg_lines) = sections.get("// --- Game Prompts and Messages (from card_handler.rs) ---") else {
+    let Some(msg_lines) =
+        sections.get("// --- Game Prompts and Messages (from card_handler.rs) ---")
+    else {
         eprintln!("Warning: Messages section missing. Using fallback.");
         return format!("[{key}]");
     };
@@ -180,7 +183,8 @@ pub fn get_error_message(error_key: &str) -> String {
 #[must_use]
 pub fn get_action_message(action_key: &str, state: Option<&GameState>) -> String {
     let sections = load_art_sections();
-    let Some(action_lines) = sections.get("// --- Game Actions (from player_handler.rs) ---") else {
+    let Some(action_lines) = sections.get("// --- Game Actions (from player_handler.rs) ---")
+    else {
         eprintln!("Warning: Game actions section missing. Using fallback.");
         return format!("[{action_key}]");
     };

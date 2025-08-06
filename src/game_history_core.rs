@@ -54,7 +54,8 @@ pub struct GameHistory {
 }
 
 impl GameHistory {
-    #[must_use] pub fn new() -> Self {
+    #[must_use]
+    pub fn new() -> Self {
         GameHistory {
             rounds: Vec::new(),
             session_start: Local::now(),
@@ -95,7 +96,8 @@ impl GameHistory {
         self.rounds.push(round);
     }
 
-    #[must_use] pub fn get_win_rate(&self) -> f64 {
+    #[must_use]
+    pub fn get_win_rate(&self) -> f64 {
         if self.total_games_played == 0 {
             0.0
         } else {
@@ -103,7 +105,8 @@ impl GameHistory {
         }
     }
 
-    #[must_use] pub fn get_net_profit(&self) -> i32 {
+    #[must_use]
+    pub fn get_net_profit(&self) -> i32 {
         self.total_money_won - self.total_money_lost
     }
 }

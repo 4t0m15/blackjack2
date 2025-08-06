@@ -3,7 +3,8 @@ use crate::game_loop::read_char;
 use crate::game_state::GameState;
 use std::io::{self, Write};
 
-#[must_use] pub fn hand_value(hand: &[String]) -> i32 {
+#[must_use]
+pub fn hand_value(hand: &[String]) -> i32 {
     let mut total = 0;
     let mut aces = 0;
     for card in hand {
@@ -27,7 +28,8 @@ use std::io::{self, Write};
     total
 }
 
-#[must_use] pub fn card_art_index(card: &str) -> usize {
+#[must_use]
+pub fn card_art_index(card: &str) -> usize {
     match card.split_whitespace().next() {
         Some("A") => 0,
         Some("2") => 1,
@@ -158,7 +160,11 @@ fn play_split_hand(hand: &mut Vec<String>, hand_name: &str, state: &mut GameStat
     }
 }
 
-#[allow(clippy::too_many_lines, clippy::cast_possible_truncation, clippy::cast_possible_wrap)]
+#[allow(
+    clippy::too_many_lines,
+    clippy::cast_possible_truncation,
+    clippy::cast_possible_wrap
+)]
 pub fn player_turn(state: &mut GameState) -> bool {
     loop {
         print!("Choose an action: (h)it, (s)tand");

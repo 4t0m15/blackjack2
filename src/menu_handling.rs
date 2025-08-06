@@ -18,7 +18,8 @@ pub struct Menu {
 }
 
 impl Menu {
-    #[must_use] pub fn new() -> Self {
+    #[must_use]
+    pub fn new() -> Self {
         Menu {
             current_action: MenuAction::Invalid,
         }
@@ -55,7 +56,8 @@ impl Default for Menu {
 }
 
 impl MenuAction {
-    #[must_use] pub fn from_string(input: &str) -> Self {
+    #[must_use]
+    pub fn from_string(input: &str) -> Self {
         match input.trim().to_lowercase().as_str() {
             "a" => MenuAction::About,
             "h" => MenuAction::Help,
