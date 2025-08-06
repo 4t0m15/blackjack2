@@ -1,6 +1,5 @@
-use crate::art_handler::{get_card_art, get_error_message, get_action_message};
+use crate::art_handler::{get_card_art, get_error_message};
 use crate::card_handler::{read_char, GameState};
-use crate::save_system::{auto_save, create_save_data};
 use std::io::{self, Write};
 
 pub fn hand_value(hand: &[String]) -> i32 {
@@ -79,11 +78,11 @@ pub fn print_player_cards(state: &GameState) {
 
 pub fn player_turn(state: &mut GameState) -> bool {
     loop {
+        print!("Choose an action: (h)it, (s)tand");
         if state.player_card_count == 2 && state.money >= state.bet {
-            print!("{}: ", get_action_message("Choose an action: (h)it, (s)tand, (d)ouble down", None));
-        } else {
-            print!("{}: ", get_action_message("Choose an action: (h)it, (s)tand", None));
+            print!(", (d)ouble down");
         }
+        print!(": ");
         io::stdout().flush().ok();
 
         let action = read_char();
@@ -96,11 +95,8 @@ pub fn player_turn(state: &mut GameState) -> bool {
                 print_player_cards(state);
 
                 if hand_value(&state.player_cards) > 21 {
-                    println!("{}", get_action_message("You busted!", None));
+                    println!("You busted! Dealer wins.");
                     state.games_lost += 1;
-                    // Auto-save after player bust
-                    let save_data = create_save_data(state.money, state.games_won, state.games_lost);
-                    auto_save(&save_data);
                     return false;
                 }
             }
@@ -108,6 +104,7 @@ pub fn player_turn(state: &mut GameState) -> bool {
             'd' if state.player_card_count == 2 && state.money >= state.bet => {
                 state.money -= state.bet;
                 state.bet *= 2;
+                state.was_double_down = true;
                 let card = draw(state);
                 state.player_cards.push(card.clone());
                 state.player_card_count = state.player_cards.len() as i32;
@@ -115,20 +112,17 @@ pub fn player_turn(state: &mut GameState) -> bool {
                 print_player_cards(state);
 
                 if hand_value(&state.player_cards) > 21 {
-                    println!("{}", get_action_message("You busted!", None));
+                    println!("You busted! Dealer wins.");
                     state.games_lost += 1;
-                    // Auto-save after player bust on double down
-                    let save_data = create_save_data(state.money, state.games_won, state.games_lost);
-                    auto_save(&save_data);
                     return false;
                 }
                 return true;
             }
             'd' if state.money < state.bet => {
-                println!("{}", get_error_message("Not enough money to double down"));
+                println!("Not enough money to double down!");
             }
             _ => {
-                println!("{}", get_error_message("Invalid action"));
+                println!("Invalid action, please choose again.");
             }
         }
     }

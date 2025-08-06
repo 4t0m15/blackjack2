@@ -1,5 +1,6 @@
-use crate::art_handler::{get_message, get_splash_screen, print_game_status, get_error_message, get_action_message};
-use crate::save_system::{auto_save, create_save_data, load_save_data, SaveData, STARTING_MONEY};
+use crate::art_handler::{get_message, get_splash_screen, print_game_status};
+use crate::game_history::{GameHistory, GameOutcome, GameRound};
+use chrono::Local;
 use rand::seq::SliceRandom;
 use rand::thread_rng;
 use std::io::{self, Write};
@@ -20,6 +21,29 @@ pub struct GameState {
     pub player_card_count: i32,
     pub dealer_card_count: i32,
     pub deck_index: i32,
+    pub history: GameHistory,
+    pub current_round_start_money: i32,
+    pub was_double_down: bool,
+}
+
+impl GameState {
+    pub fn new() -> Self {
+        GameState {
+            card_deck: Vec::new(),
+            player_cards: Vec::new(),
+            dealer_cards: Vec::new(),
+            money: 10,
+            bet: 0,
+            games_won: 0,
+            games_lost: 0,
+            player_card_count: 0,
+            dealer_card_count: 0,
+            deck_index: 0,
+            history: GameHistory::new(),
+            current_round_start_money: 10,
+            was_double_down: false,
+        }
+    }
 }
 
 fn create_deck() -> Vec<String> {
@@ -34,87 +58,42 @@ fn create_deck() -> Vec<String> {
 }
 
 pub fn start_blackjack() {
-    // Load saved data
-    let save_data = load_save_data();
-    
-    let mut state = GameState {
-        card_deck: Vec::new(),
-        player_cards: Vec::new(),
-        dealer_cards: Vec::new(),
-        money: save_data.money,
-        bet: 0,
-        games_won: save_data.games_won,
-        games_lost: save_data.games_lost,
-        player_card_count: 0,
-        dealer_card_count: 0,
-        deck_index: 0,
-    };
+    let mut state = GameState::new();
+    start_blackjack_with_state(&mut state);
+}
+
+pub fn start_blackjack_with_state(state: &mut GameState) {
     print_splash_screen();
     delay();
     loop {
+        print!("{}\n", get_message("You have", Some(&state)));
+        io::stdout().flush().ok();
         if state.money <= 0 {
             println!("\x1b[1;31m{}\x1b[0m", get_message("Game Over", None));
             print!("{} ", get_message("Do you want to (t)ry again", None));
             io::stdout().flush().ok();
             let c = read_char();
             if c == 't' {
-                state.money = STARTING_MONEY;
+                state.money = 10;
                 state.games_won = 0;
                 state.games_lost = 0;
-                // Save the reset state
-                let save_data = create_save_data(state.money, state.games_won, state.games_lost);
-                auto_save(&save_data);
+                state.history = GameHistory::new();
                 continue;
             } else {
                 break;
             }
         }
-        setup_new_round(&mut state);
+        setup_new_round(state);
         print_game_status(&state);
+        state.current_round_start_money = state.money;
         state.bet = get_bet(&state);
         state.money -= state.bet;
+        state.was_double_down = false;
         println!("{}", get_message("Dealer shows", Some(&state)));
         print_player_cards(&state);
-
-        // Insurance offer when dealer shows an Ace
-        let mut insurance_bet = 0;
-        if state.dealer_cards.first()
-            .and_then(|card| card.split_whitespace().next())
-            .map_or(false, |rank| rank == "A") {
-            print!("{} ", get_action_message("Dealer shows an Ace", None));
-            io::stdout().flush().ok();
-            let ans = read_char();
-            if ans == 'y' {
-                insurance_bet = state.bet / 2;
-                if insurance_bet > 0 && state.money >= insurance_bet {
-                    state.money -= insurance_bet;
-                    println!("{}", get_action_message("Insurance bet", Some(&state)));
-                } else {
-                    println!("{}", get_error_message("Not enough money for insurance"));
-                    insurance_bet = 0;
-                }
-            }
-            // Check for dealer blackjack
-            if hand_value(&state.dealer_cards) == 21 {
-                println!("{}", get_action_message("Dealer has blackjack", None));
-                if insurance_bet > 0 {
-                    let payout = insurance_bet * 3;
-                    state.money += payout;
-                    println!("{}", get_action_message("Insurance pays", Some(&state)));
-                }
-                state.games_lost += 1;
-                // Auto-save after dealer blackjack
-                let save_data = create_save_data(state.money, state.games_won, state.games_lost);
-                auto_save(&save_data);
-                continue; // end round immediately
-            } else {
-                println!("{}", get_action_message("Dealer does not have blackjack", None));
-            }
-        }
-
-        if player_turn(&mut state) {
-            enemy_ai_handler::dealer_turn(&mut state);
-            determine_winner(&mut state);
+        if player_turn(state) {
+            enemy_ai_handler::dealer_turn(state);
+            determine_winner(state);
         }
     }
 }
@@ -145,7 +124,7 @@ fn setup_new_round(state: &mut GameState) {
 
 fn get_bet(state: &GameState) -> i32 {
     loop {
-        print!("{} ", get_message("How many coins", None));
+        print!("How many coins do you want to bet? ");
         io::stdout().flush().ok();
         let mut line = String::new();
         io::stdin().read_line(&mut line).ok();
@@ -154,7 +133,7 @@ fn get_bet(state: &GameState) -> i32 {
                 return n;
             }
         }
-        println!("{}", get_message("Please bet between", Some(state)));
+        println!("Please bet between 1 and {} coins.", state.money);
     }
 }
 
@@ -164,29 +143,61 @@ fn determine_winner(state: &mut GameState) {
     println!("Your total: {}", p_total);
     println!("Dealer's total: {}", d_total);
     use std::cmp::Ordering;
-    match (p_total > 21, d_total > 21, p_total.cmp(&d_total)) {
-        (_, true, _) => player_wins(state),
-        (true, _, _) => dealer_wins(state),
-        (_, _, Ordering::Greater) => player_wins(state),
-        (_, _, Ordering::Less) => dealer_wins(state),
+
+    let outcome = match (p_total > 21, d_total > 21, p_total.cmp(&d_total)) {
+        (_, true, _) => {
+            player_wins(state);
+            GameOutcome::DealerBust
+        }
+        (true, _, _) => {
+            dealer_wins(state);
+            GameOutcome::PlayerBust
+        }
+        (_, _, Ordering::Greater) => {
+            player_wins(state);
+            GameOutcome::PlayerWin
+        }
+        (_, _, Ordering::Less) => {
+            dealer_wins(state);
+            GameOutcome::DealerWin
+        }
         _ => {
             println!("It's a tie!");
             state.money += state.bet;
+            GameOutcome::Tie
         }
-    }
-    
-    // Auto-save after each round
-    let save_data = SaveData {
-        money: state.money,
-        games_won: state.games_won,
-        games_lost: state.games_lost,
     };
-    auto_save(&save_data);
+
+    record_game_result(state, outcome);
 }
 
 fn dealer_wins(state: &mut GameState) {
     println!("\x1b[1;31m{}\x1b[0m", get_message("Dealer Wins!", None));
     state.games_lost += 1;
+}
+
+fn record_game_result(state: &mut GameState, outcome: GameOutcome) {
+    let p_total = hand_value(&state.player_cards);
+    let d_total = hand_value(&state.dealer_cards);
+    let money_change = state.money - state.current_round_start_money;
+
+    let round = GameRound {
+        round_number: state.history.total_games_played + 1,
+        timestamp: Local::now(),
+        bet_amount: state.bet,
+        player_cards: state.player_cards.clone(),
+        dealer_cards: state.dealer_cards.clone(),
+        player_total: p_total,
+        dealer_total: d_total,
+        outcome: outcome.clone(),
+        money_change,
+        money_after: state.money,
+        was_double_down: state.was_double_down,
+        player_busted: p_total > 21,
+        dealer_busted: d_total > 21,
+    };
+
+    state.history.add_round(round);
 }
 
 pub fn read_char() -> char {

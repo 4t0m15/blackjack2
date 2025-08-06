@@ -131,8 +131,15 @@ You Win!
 Dealer Wins!
 loading...
 
+// --- Error Messages (from various files) ---
+Invalid card format
+Unknown card rank
+Not enough money for insurance
+Invalid option
+Please try again
+
 // --- Main Menu Prompt (from main.rs) ---
-Choose an option: (a)bout, (n)ew game, (h)elp, (g)uide, (q)uit:
+Choose an option: (a)bout, (n)ew game, (h)elp, (g)uide:
 
 // --- About Text (from main_menu.rs) ---
 About: A simple text-based blackjack game written in Rust.
@@ -141,7 +148,7 @@ Source code is found at: (https://github.com/4t0m15/blackjack2).
 Created by Arsen Martirosyan.
 
 // --- Help Text (from main_menu.rs) ---
-Controls: 
+Controls:
 n - Game Start
 a - About
 h - Help (where you are now)

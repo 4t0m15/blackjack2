@@ -8,6 +8,7 @@ pub enum MenuAction {
     Help,
     Guide,
     NewGame,
+    History,
     Quit,
     Invalid,
 }
@@ -58,6 +59,7 @@ impl MenuAction {
             "h" => MenuAction::Help,
             "g" => MenuAction::Guide,
             "n" => MenuAction::NewGame,
+            "r" => MenuAction::History,
             "q" => MenuAction::Quit,
             _ => MenuAction::Invalid,
         }
@@ -79,6 +81,9 @@ impl MenuAction {
             }
             MenuAction::NewGame => {
                 card_handler::start_blackjack();
+            }
+            MenuAction::History => {
+                println!("History functionality is handled by GameManager");
             }
             MenuAction::Quit => {
                 std::process::exit(0);
