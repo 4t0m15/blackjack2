@@ -23,9 +23,11 @@ pub fn start_blackjack_with_state(state: &mut GameState) {
             io::stdout().flush().ok();
             let c = read_char();
             if c == 't' {
-                state.money = 10;
+                state.money = crate::save_system::STARTING_MONEY;
                 state.games_won = 0;
                 state.games_lost = 0;
+                // Save the reset state
+                state.save_to_disk();
                 // Don't reset history - keep the game history across restarts
                 continue;
             }

@@ -77,4 +77,7 @@ fn record_game_result(state: &mut GameState, outcome: GameOutcome) {
     if let Err(e) = fs::write(&path, csv_content) {
         eprintln!("Failed to save game history to stats.csv: {e}");
     }
+    
+    // Save the current game state (money, wins, losses) to JSON file
+    state.save_to_disk();
 }

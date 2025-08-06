@@ -14,6 +14,7 @@ pub mod history_menu;
 pub mod main_menu;
 pub mod menu_handling;
 pub mod player_handler;
+pub mod save_system;
 pub mod text_handler;
 pub mod win_checker;
 
