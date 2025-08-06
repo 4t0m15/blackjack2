@@ -2,7 +2,7 @@ use crate::art_handler::{get_message, get_splash_screen, print_game_status};
 use crate::deck_manager::create_and_shuffle_deck;
 use crate::enemy_ai_handler;
 use crate::game_state::GameState;
-use crate::player_handler::{player_turn, print_player_cards};
+use crate::player_handler::{player_turn, print_initial_game_state};
 use crate::win_checker::determine_winner;
 use std::io::{self, Write};
 use std::thread;
@@ -44,8 +44,7 @@ pub fn start_blackjack_with_state(state: &mut GameState) {
         }
         state.money -= state.bet;
         state.was_double_down = false;
-        println!("{}", get_message("Dealer shows", Some(state)));
-        print_player_cards(state);
+        print_initial_game_state(state);
 
         let player_busted = !player_turn(state);
         if player_busted {

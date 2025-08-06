@@ -1,10 +1,17 @@
 Round,Timestamp,Bet,PlayerCards,DealerCards,PlayerTotal,DealerTotal,Outcome,MoneyChange,MoneyAfter,DoubleDown,PlayerBust,DealerBust
-1,2025-08-06 14:02:41,5,"5 Hearts | J Spades | A Spades","8 Hearts | J Clubs",16,18,Dealer Win,-5,5,false,false,false
-2,2025-08-06 14:02:41,5,"9 Hearts | 2 Diamonds | 9 Diamonds","A Clubs | 4 Spades | 4 Clubs",20,19,Player Win,5,15,false,false,false
-3,2025-08-06 14:02:41,5,"8 Spades | K Spades","9 Clubs | 9 Diamonds",18,18,Tie,0,10,false,false,false
-4,2025-08-06 14:02:41,5,"3 Hearts | 4 Hearts | K Diamonds","8 Spades | 7 Hearts | J Spades",17,25,Dealer Bust,5,15,false,false,true
-5,2025-08-06 14:02:41,100,"K Clubs | K Spades","10 Diamonds | 3 Clubs | A Spades | 9 Clubs",20,23,Dealer Bust,100,200,false,false,true
-6,2025-08-06 14:02:41,100,"4 Diamonds | 8 Hearts | 7 Clubs","8 Diamonds | 8 Spades | 2 Clubs",19,18,Player Win,100,300,false,false,false
-7,2025-08-06 14:02:41,300,"7 Clubs | 9 Clubs | 5 Diamonds","7 Diamonds | K Hearts",21,17,Player Win,300,600,false,false,false
-8,2025-08-06 14:02:41,500,"A Clubs | 6 Diamonds | K Hearts","4 Spades | 6 Spades | 9 Diamonds",17,19,Dealer Win,-500,100,false,false,false
-9,2025-08-06 14:02:53,100,"3 Clubs | A Hearts | J Diamonds | 2 Diamonds | Q Spades","8 Diamonds | 2 Spades",26,10,Player Bust,-100,0,false,true,false
+1,2025-08-06 14:36:43,5,"5 Hearts | J Spades | A Spades","8 Hearts | J Clubs",16,18,Dealer Win,-5,5,false,false,false
+2,2025-08-06 14:36:43,5,"9 Hearts | 2 Diamonds | 9 Diamonds","A Clubs | 4 Spades | 4 Clubs",20,19,Player Win,5,15,false,false,false
+3,2025-08-06 14:36:43,5,"8 Spades | K Spades","9 Clubs | 9 Diamonds",18,18,Tie,0,10,false,false,false
+4,2025-08-06 14:36:43,5,"3 Hearts | 4 Hearts | K Diamonds","8 Spades | 7 Hearts | J Spades",17,25,Dealer Bust,5,15,false,false,true
+5,2025-08-06 14:36:43,100,"K Clubs | K Spades","10 Diamonds | 3 Clubs | A Spades | 9 Clubs",20,23,Dealer Bust,100,200,false,false,true
+6,2025-08-06 14:36:43,100,"4 Diamonds | 8 Hearts | 7 Clubs","8 Diamonds | 8 Spades | 2 Clubs",19,18,Player Win,100,300,false,false,false
+7,2025-08-06 14:36:43,300,"7 Clubs | 9 Clubs | 5 Diamonds","7 Diamonds | K Hearts",21,17,Player Win,300,600,false,false,false
+8,2025-08-06 14:36:43,500,"A Clubs | 6 Diamonds | K Hearts","4 Spades | 6 Spades | 9 Diamonds",17,19,Dealer Win,-500,100,false,false,false
+9,2025-08-06 14:36:43,100,"3 Clubs | A Hearts | J Diamonds | 2 Diamonds | Q Spades","8 Diamonds | 2 Spades",26,10,Player Bust,-100,0,false,true,false
+10,2025-08-06 14:36:43,100,"K Spades | A Diamonds","Q Clubs | 3 Diamonds | 3 Hearts | Q Diamonds",21,26,Dealer Bust,100,200,false,false,true
+11,2025-08-06 14:36:43,20,"A Spades | 4 Spades | 2 Spades","A Clubs | 10 Spades",17,21,Dealer Win,-20,180,false,false,false
+12,2025-08-06 14:36:43,180,"Q Hearts | 10 Diamonds","7 Hearts | 2 Hearts | K Clubs",20,19,Player Win,180,360,false,false,false
+13,2025-08-06 14:36:57,120,"K Diamonds | J Spades | 2 Spades","9 Diamonds | A Clubs",22,20,Player Bust,-120,240,true,true,false
+14,2025-08-06 14:37:06,40,"7 Clubs | 3 Clubs | K Diamonds","6 Clubs | K Hearts | 6 Diamonds",20,22,Dealer Bust,40,280,false,false,true
+15,2025-08-06 14:37:12,80,"7 Diamonds | J Clubs | 6 Hearts","10 Clubs | 5 Diamonds",23,15,Player Bust,-80,200,false,true,false
+16,2025-08-06 14:37:17,100,"A Spades | Q Clubs","5 Diamonds | 10 Hearts | 8 Hearts",21,23,Dealer Bust,100,300,false,false,true

@@ -77,6 +77,26 @@ pub fn print_player_cards(state: &GameState) {
     }
 }
 
+pub fn print_initial_game_state(state: &GameState) {
+    println!("Dealer shows: {} (hole card hidden)", state.dealer_cards[0]);
+    println!("Your total: {}", hand_value(&state.player_cards));
+    let card_art = get_card_art();
+    let card_arts: Vec<Vec<&str>> = state
+        .player_cards
+        .iter()
+        .map(|card| card_art[card_art_index(card)].lines().collect())
+        .collect();
+    if card_arts.is_empty() {
+        return;
+    }
+    for line_idx in 0..card_arts[0].len() {
+        for card in &card_arts {
+            print!("{} ", card[line_idx]);
+        }
+        println!();
+    }
+}
+
 fn print_hand_cards(hand: &[String], hand_name: &str) {
     println!("{} total: {}", hand_name, hand_value(hand));
     let card_art = get_card_art();
