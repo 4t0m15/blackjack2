@@ -14,8 +14,7 @@ pub fn print_menu() {
 pub fn read_menu_input() -> Result<String, std::io::Error> {
     let mut input_string = String::new();
     io::stdout().flush().ok();
-    io::stdin()
-        .read_line(&mut input_string)?;
+    io::stdin().read_line(&mut input_string)?;
     Ok(input_string.trim().to_string())
 }
 
